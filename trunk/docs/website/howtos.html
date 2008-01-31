@@ -92,7 +92,10 @@ scenario "pop is called on empty stack", {
       popnull()
     }
   }
-    andThen "the stack should still be empty", {
+  
+  and
+  
+  then "the stack should still be empty", {
       ensure(stack.empty) {
         isTrue
       }
