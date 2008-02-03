@@ -22,7 +22,7 @@ Ant.path(id:"build.classpath"){
 	fileset(dir:libdir, includes:jarincludes)
 }
 
-target(configuregroovy:"configures enviornment to compile w/Groovy"){
+target(configuregroovy:"configures environment to compile w/Groovy"){
  depends(init)
  Ant.taskdef(name:"groovyc",
     classname:"org.codehaus.groovy.ant.Groovyc", classpathref:"build.classpath"){
