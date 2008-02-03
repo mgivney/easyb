@@ -1,6 +1,6 @@
 includeTool << gant.tools.Ivy
 
-version = "0.06"
+version = "0.7"
 defaultdir = "target"
 libdir = "${defaultdir}/lib"
 jarincludes = "**/*.jar"
