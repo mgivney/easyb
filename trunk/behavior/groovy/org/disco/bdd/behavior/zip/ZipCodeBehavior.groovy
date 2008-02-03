@@ -8,16 +8,12 @@ before "initialize zipcodevalidator instance", {
 
 it "should deny invalid zip codes", {
 	["221o1", "2210", "22010-121o"].each{ zip ->
-		ensure(zipvalidate.validate(zip)) { 
-			isFalse 
-		}
+		zipvalidate.validate(zip).is false
 	}
 }
 
 it "should accept valid zip codes", {
 	["22101", "22100", "22010-1210"].each{ zip ->
-		ensure(zipvalidate.validate(zip)) { 
-			isTrue
-		}
+		zipvalidate.validate(zip).shouldBe true
 	}
 }

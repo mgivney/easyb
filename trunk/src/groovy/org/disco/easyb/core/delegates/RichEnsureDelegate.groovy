@@ -12,19 +12,20 @@ class RichEnsureDelegate {
    * 
    */
   def void and(){
-	 // println "noop!! with and"
+	  //println "noop!! with and"
 	  //noop
   }
   /**
    * This method isn't currently working
    */	
   def is(value){
-	  println "is invoked in FlexDelegate"
+	 // println "is invoked in FlexDelegate"
   }
   /**
    * 
    */
   def void contains(Object value){
+	  //println "in rich contains"
 	  if(this.verified instanceof Map){
 		  if(value instanceof Map){
 			  this.handleMapContains(value)
@@ -83,8 +84,8 @@ class RichEnsureDelegate {
 	}
   }
   /**
-   *
-   */
+   **/
+   
   def void isEqualTo(Object value){
 	  if(value.getClass() == String.class){
 		  if(!value.toString().equals(verified.toString())){
@@ -97,8 +98,8 @@ class RichEnsureDelegate {
 	  }
   }
   /**
-   * 
-   */
+   **/ 
+   
   def void isNotEqualTo(Object value){
 	  if(value.getClass() == String.class){
 		  if(value.toString().equals(verified.toString())){
@@ -139,6 +140,7 @@ class RichEnsureDelegate {
    * 
    */
   def void isNotNull(){
+	  //println "in rich ensure isNotNull"
     if(verified == null){
 		  throw new VerificationException("value is null")
 	  }
@@ -147,6 +149,7 @@ class RichEnsureDelegate {
    * 
    */	
   def void isNull(){
+	 // println "in rich ensure isNull"
 	  if(verified != null){
 		  throw new VerificationException("value isn't null")
 	  }

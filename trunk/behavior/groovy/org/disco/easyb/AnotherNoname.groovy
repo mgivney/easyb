@@ -11,7 +11,5 @@ when "length is called", {
 }
 
 then "the value returned should be 6", {
-	ensure(len){
-		isEqualTo6
-	}
+	len.is(6)
 }

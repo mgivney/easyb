@@ -15,17 +15,13 @@ scenario "pop is called on stack with one value", {
   }
 
   then "that object should be returned", {
-    ensure(popVal) {
-      isEqualTo pushVal
-    }
+    popVal.shouldBe pushVal
   }
 
   and
 
   then "the stack should be empty", {
-      ensure(stack.empty) {
-        isTrue
-      }
+      stack.empty.shouldBe true
     }
 }
 
@@ -38,9 +34,7 @@ scenario "stack with one value is not empty", {
   }
 
   then "the stack should not be empty", {
-    ensure(stack.empty) {
-      isFalse
-    }
+	  stack.empty.shouldBe false
   }
 }
 
@@ -57,32 +51,37 @@ scenario "peek is called", {
   }
 
   then "it should provide the value of the most recent pushed value", {
-    ensure(peeked) {
-      isEqualTofoo
-    }
+    peeked.shouldBe("foo")
+    peeked.shouldBe "foo"
+    peeked.shouldEqual "foo"
+    peeked.is "foo"
+    peeked.shouldBeEqualTo "foo"
   }
 
   and
 
   then "the stack should not be empty", {
-      ensure(!stack.empty)
+      stack.empty.shouldBe false
     }
 
   and
 
   then "calling pop should also return the peeked value which is the same as the original pushed value", {
-      ensure(stack.pop()) {
-        isEqualTo(push1)
-        and
-        isEqualTo(peeked)
-      }
+      //ensure(stack.pop()) {
+      //  isEqualTo(push1)
+       // and
+        //isEqualTo(peeked)
+      //}
+      def popped = stack.pop()
+      
+      popped.shouldBe(push1)
+      and
+      popped.shouldBe(peeked)
     }
 
   and
 
   then "the stack should  be empty", {
-      ensure(stack.empty) {
-        isTrue
-      }
+      stack.empty.shouldBe true
     }
 }

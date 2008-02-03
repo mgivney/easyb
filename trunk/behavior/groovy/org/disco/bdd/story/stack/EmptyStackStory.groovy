@@ -23,9 +23,7 @@ scenario "null is pushed onto empty stack", {
   and
 
   then "the stack should still be empty", {
-    ensure(stack.empty) {
-      isTrue
-    }
+   stack.empty.shouldBe true
   }
 }
 
@@ -51,8 +49,6 @@ scenario "pop is called on empty stack", {
  and
 
  then "the stack should still be empty", {
-      ensure(stack.empty) {
-        isTrue
-      }
+	 stack.empty.shouldBe true
     }
 }

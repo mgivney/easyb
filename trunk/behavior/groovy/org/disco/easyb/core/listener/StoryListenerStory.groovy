@@ -14,41 +14,31 @@ scenario "listener is given all successful results", {
   }
 
   then "it should have no failures", {
-    ensure(listener.hasBehaviorFailures()) {
-      isFalse
-    }
+    listener.hasBehaviorFailures().is false
   }
 
   and
 
   then "the count of failed specifications should be 0", {
-    ensure(listener.getFailedBehaviorCount()) {
-      isEqualTo0
-    }
+    listener.getFailedBehaviorCount().shouldBe 0
   }
 
   and
 
   then "the count of successful specifications should be 1", {
-    ensure(listener.getSuccessfulBehaviorCount()) {
-      isEqualTo1
-    }
+   listener.getSuccessfulBehaviorCount().shouldBe 1
   }
 
   and
 
   then "the count of total specifications should be 1", {
-    ensure(listener.getTotalBehaviorCount()) {
-      isEqualTo1
-    }
+   listener.getTotalBehaviorCount().shouldBe 1
   }
 
   and
 
   then "the total specifications should equal the successful specifications", {
-    ensure(listener.getTotalBehaviorCount()) {
-      isEqualTo listener.getSuccessfulBehaviorCount()
-    }
+    listener.getTotalBehaviorCount().shouldEqual listener.getSuccessfulBehaviorCount()
   }
 
 }
@@ -65,41 +55,31 @@ scenario "listener is given a single failure", {
   }
 
   then "it should have failures", {
-    ensure(listener.hasBehaviorFailures()) {
-      isTrue
-    }
+    listener.hasBehaviorFailures().is(true)
   }
 
   and
 
   then "the count of failed specifications should be 1", {
-    ensure(listener.getFailedBehaviorCount()) {
-      isEqualTo1
-    }
+   listener.getFailedBehaviorCount().shouldBe(1)
   }
 
   and
 
   then "the count of successful specifications should be 0", {
-    ensure(listener.getSuccessfulBehaviorCount()) {
-      isEqualTo0
-    }
+    listener.getSuccessfulBehaviorCount().is(0)
   }
 
   and
 
   then "the count of total specifications should be 1", {
-    ensure(listener.getTotalBehaviorCount()) {
-      isEqualTo1
-    }
+   listener.getTotalBehaviorCount().shouldBe 1
   }
 
   and
 
   then "the total specifications should equal the failed specifications", {
-    ensure(listener.getTotalBehaviorCount()) {
-      isEqualTo listener.getFailedBehaviorCount()
-    }
+    listener.getTotalBehaviorCount().shouldBeEqualTo listener.getFailedBehaviorCount()
   }
 
 }

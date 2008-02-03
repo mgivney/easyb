@@ -17,5 +17,5 @@ when "validate is invoked with the invalid zip code", {
 }
 
 then "the validator instance should return false", {
-	ensure(!value)
+	value.shouldBe(false)
 }

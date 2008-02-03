@@ -16,17 +16,13 @@ scenario "pop returns last item", {
   }
 
   then "the last item pushed should be returned", {
-    ensure(popVal) {
-      isEqualTo(push2)
-    }
+    popVal.shouldBe push2
   }
 
   and
 
-  then "the stack should not be empty", {              
-      ensure(stack.empty) {
-        isFalse
-      }
+  then "the stack should not be empty", {   
+      stack.empty.shouldBe false
     }
 }
 

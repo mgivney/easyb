@@ -7,9 +7,7 @@ before "increment the int value", {
 }
 
 it "should be 1 now", {
-	ensure(value) {
-    isEqualTo1
-  }
+	value.shouldBe(1)
 }
 
 it "should be 2 now",{

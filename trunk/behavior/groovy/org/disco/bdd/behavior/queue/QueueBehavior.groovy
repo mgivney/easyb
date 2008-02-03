@@ -8,8 +8,7 @@ before "initialize the queue for each spec", {
 
 it "should dequeue item just enqueued", {
  	queue.enqueue(2)
-	//ensure(queue.dequeue()) { isEqualTo2 }
- 	ensure(queue.dequeue() == 2)
+ 	queue.dequeue().shouldBe(2)
 }
 
 it "should throw an exception when null is enqueued", {
@@ -23,6 +22,6 @@ it "should dequeue items in same order enqueued", {
 		queue.enqueue(val)
 	}
 	[1..5].each{ val ->
-		ensure(queue.dequeue()) { isEqualTo(val) }
+		queue.dequeue().shouldBe(val)
 	}
 }

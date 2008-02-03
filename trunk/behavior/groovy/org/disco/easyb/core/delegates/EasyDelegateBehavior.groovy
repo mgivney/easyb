@@ -11,7 +11,7 @@ before "obtain a reference to the binding object", {
 
 it "should support a simple ensure call", {
 	itbehave("ensure equality"){
-		ensure(1) { isEqualTo(1) }
+		1.shouldBe(1)
 	}
 }
 
@@ -25,23 +25,25 @@ it "should support a catching an exception via ensureThrows call", {
 }
 
 it "should support chaining in the ensure call", {
+	
 	itbehave("chained ensure calls"){
+		
 		String value = "test"
+		//value.isA(String)
 		ensure(value) { isAString }
+		ensure(value) {
+			isAString
+			and
+			isNotAnInteger
+		}
 
 		ensure(value) {
-      isAString
-      and
-      isNotAnInteger
-    }
-
-		ensure(value) {
-      isAString
-      and
-      isNotNull
-      and
-      isEqualTo("test")
-    }
+			isAString
+			and
+			isNotNull
+			and
+			isEqualTo("testing")
+		}
 	}
 }
 

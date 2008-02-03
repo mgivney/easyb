@@ -11,25 +11,19 @@ before "obtain a reference to the binding object", {
 
 it "should have an it method which isn't null", {
 	itmethod = binding.it
-	ensure(itmethod) {
-    isNotNull
-  }
+	itmethod.shouldNotBe(null)
 }
 
 it "should accept 2 parameters", {
 	itmethod = binding.it
-	ensure(itmethod.getMaximumNumberOfParameters()) {
-    isEqualTo(2)
-  }
+	itmethod.getMaximumNumberOfParameters().shouldBe(2)
 }
 
 it "should accept a String and a closure and not throw any exceptions",{
 	itmethod = binding.it
 	try{
 		itmethod("test"){
-			ensure(1) {
-        isEqualTo(1)
-      }
+			1.shouldBe(1)
 		}
 	}catch(Throwable thr){
 		fail("apparently the it closure isn't working")
@@ -39,15 +33,11 @@ it "should accept a String and a closure and not throw any exceptions",{
 it "should create a delegate for the passed in closure",{
 	itmethod = binding.it
 	xclos = { 
-		ensure(1) {
-      isEqualTo(1)
-    }
+		1.shouldBe(1)
 	}
 	try{
 		itmethod("blah", xclos)
-		ensure(xclos.delegate.class.name) {
-      		isEqualTo("org.disco.easyb.core.delegates.EnsuringDelegate")
-    	}
+		xclos.delegate.class.name.shouldBe("org.disco.easyb.core.delegates.EnsuringDelegate")
 	}catch(Throwable thr){
 		fail("apparently the it closure isn't working")
 	}

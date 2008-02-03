@@ -25,24 +25,30 @@ String value = "test"
 //being picked up in this method call. The question is
 //"how do you override this behavior?"
 it "should work to say is test", {
-	ensure(value){
-		isEqualTo("test")
-	}
+	//ensure(value){
+	//	isEqualTo("test")
+	//}
+	value.shouldBe("test")
 }
 
 it "should not be null and should be a String (without ()s)", {
-  ensure(value){
-    isNotNull
-	isAString
-  }
+  //ensure(value){
+   // isNotNull
+	//isAString
+  //}
+  value.shouldNotBe(null)
+  value.shouldBeA(String)
 }
 
 it "should not be null AND!! should be a String (without ()s)", {
-	ensure(value){
-		isNotNull
-		and
-		isAString
-	}
+	//ensure(value){
+	//	isNotNull
+	//	and
+	//	isAString
+	//}
+	value.shouldntBe(null)
+	and
+	value.shouldBeA(String)
 }
 
 it "should be null", {
@@ -50,6 +56,7 @@ it "should be null", {
 	ensure(tst){
 		isNull()
 	}
+	//tst.isNull()
 }
 
 it "should be null", {
@@ -61,70 +68,83 @@ it "should be null", {
 
 it "should not be null and should be an Integer", {
 	Integer ival = 10
-	ensure(ival){
-		isNotNull
-		isAnInteger
-	}
+	//ensure(ival){
+	//	isNotNull
+	//	isAnInteger
+	//}
+	ival.shouldNotBe(null)
+	ival.shouldBeAn(Integer)
 }
 
+
+
 it "should be equal to test", {
-	ensure(value){
-		isEqualTo("test")
-	}
+	//ensure(value){
+	//	isEqualTo("test")
+	//}
+	value.shouldBeEqualTo("test")
 }
 
 it "should be equal to 23", {
 	i23 = 23
-	ensure(i23){
-		isEqualTo(23)
-	}
+	//ensure(i23){
+	//	isEqualTo(23)
+	//}
+	i23.shouldBeEqualTo(23)
 }
 
 it "should be equal to Test without ()s", {
 	mVal = "Test"
-	ensure(mVal){
-		isEqualToTest
-	}
+	//ensure(mVal){
+	//	isEqualToTest
+	//}
+	mVal.shouldBe "Test"
 }
 
 it "should be equal to Test with space", {
 	mVal = "Fest"
-	ensure(mVal){
-		isEqualTo "Fest"
-	}
+	//ensure(mVal){
+	//	isEqualTo "Fest"
+	//}
+	mVal.shouldBeEqualTo "Fest"
 }
 
 it "should be equal to 23 without ()s", {
 	mVal = 23
-	ensure(mVal){
-		isEqualTo23
-	}
+	//ensure(mVal){
+	//	isEqualTo23
+	//}
+	mVal.shouldBe 23
 }
 
 it "should be equal to 33 with break", {
 	mVal = 33
-	ensure(mVal){
-		isEqualTo 33
-	}
+	//ensure(mVal){
+	//	isEqualTo 33
+	//}
+	mVal.shouldBeEqualTo 33
 
 }
 
 it "should contain est", {
-	ensure(value){
-		contains("est")
-	}
+	//ensure(value){
+	//	contains("est")
+	//}
+	value.shouldHave("est")
 }
 
  it "should find a value in an array", {
 	 ensure([1,2,3]){
 		 contains(3)
 	 }
+	 //[1,2,3].has(3)
  }
 
  it "should find some values in an array", {
 	 ensure([1,2,3]){
 		 contains([2,3])
 	 }
+	 //[1,2,3].has [2,3]
  }
 
  it "should find map key values", {
@@ -136,14 +156,23 @@ it "should contain est", {
 		 contains(another:34)
 		 contains(value)
 	 }
+	 
+	 mp.shouldHave("Andy")
+	 mp.shouldHave(55:"test")
+	 mp.shouldHave([value:"Andy", 55:"test"])
+	 mp.shouldHave(value)
+	 mp.shouldHave(another:34)
  }
-
+ 
 it "should find properties on normal objects", {
 	def person = new Person("Andy", 11)
 	ensure(person){
 		contains(firstName:"Andy")
 		contains(age:11)
 	}
+	
+	//person.has(age:11)
+	person.age.shouldBe 11
 }
 
 it "should find properties, in a map, on normal objects", {
@@ -160,6 +189,7 @@ it "should find properties, in a map, on normal objects like contains", {
 	}
 }
 
+
 def stringTrue = "true"
 def stringFalse = "false"
 def booleanTrue = true
@@ -170,6 +200,8 @@ it "should equal string true", {
     isEqualTo("true")
   }
 }
+
+
 
 it "should be isTrue", {
   ensure(stringTrue) {
