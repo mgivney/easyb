@@ -234,12 +234,6 @@ public class SpecificationRunner {
     terseStoryReport.setType(ReportType.STORY.type());
     configuredReports.add(terseStoryReport);
 
-    /*Report terseBehaviorReport = new Report();
-    terseBehaviorReport.setFormat(ReportFormat.TERSE.format());
-    terseBehaviorReport.setLocation("screen");
-    terseBehaviorReport.setType(ReportType.BEHAVIOR.type());
-    configuredReports.add(terseBehaviorReport);
-*/
     return configuredReports;
   }
 
