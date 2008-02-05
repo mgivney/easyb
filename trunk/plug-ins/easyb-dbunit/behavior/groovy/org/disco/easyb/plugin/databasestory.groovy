@@ -75,11 +75,7 @@ when "a select statement is issued for a value that could only be present if the
 }
 
 then "the word bellicose should be returned", {
-	ensure(value){
-		isNotNull
-		and
-		isEqualTobellicose
-	}
+	value.shouldBe "bellicose"
 }
 
 and 
