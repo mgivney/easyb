@@ -75,7 +75,7 @@ public class SpecificationRunner {
         } else {
         	if(!file.getName().contains("Behavior.groovy")){
         		System.out.println("You should consider ending your specification file (" +
-        			file.getAbsolutePath() + ") with either Story or Behavior. " + 
+        			file.getName() + ") with either Story or Behavior. " + 
         			"See easyb documentation for more details. ");
         	}
         	new GroovyShell(SpecificationBinding.getBinding(listener)).evaluate(file);

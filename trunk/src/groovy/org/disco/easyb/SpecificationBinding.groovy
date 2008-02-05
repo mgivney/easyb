@@ -4,7 +4,7 @@ import org.disco.easyb.core.delegates.EnsuringDelegate
 import org.disco.easyb.core.result.Result
 import org.disco.easyb.core.delegates.PlugableDelegate
 import org.disco.easyb.core.exception.VerificationException
-
+import org.codehaus.groovy.runtime.NullObject
 class SpecificationBinding {
 
 	
@@ -12,7 +12,11 @@ class SpecificationBinding {
 	  ExpandoMetaClass.enableGlobally()
 
 	  def isEqualTo = { value ->
-		  if(value.getClass() == String.class){
+	  	  if(delegate.getClass() == NullObject.class){
+	  		  if(value != null){
+	  			throw new VerificationException("expected ${value.toString()} but target object is null")
+	  		  }
+	  	  }else if(value.getClass() == String.class){
 			  if(!value.toString().equals(delegate.toString())){
 				  throw new VerificationException("expected ${value.toString()} but was ${delegate.toString()}")
 			  }
@@ -123,6 +127,8 @@ class SpecificationBinding {
 	  Object.metaClass.shouldBeEqual = isEqualTo
 	  Object.metaClass.shouldBeEqualTo = isEqualTo
 	  Object.metaClass.shouldEqual = isEqualTo
+	  
+	  //org.codehaus.groovy.runtime.NullObject.metaClass.shouldBe = isEqualTo
 	  
 	  //these need some renaming
 	  Object.metaClass.is = isEqualTo
