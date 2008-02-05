@@ -5,148 +5,11 @@ import org.disco.easyb.core.result.Result
 import org.disco.easyb.core.delegates.PlugableDelegate
 import org.disco.easyb.core.exception.VerificationException
 import org.codehaus.groovy.runtime.NullObject
+import org.disco.easyb.SpecificationCategory
+
 class SpecificationBinding {
 
-	
-  static{
-	  ExpandoMetaClass.enableGlobally()
-
-	  def isEqualTo = { value ->
-	  	  if(delegate.getClass() == NullObject.class){
-	  		  if(value != null){
-	  			throw new VerificationException("expected ${value.toString()} but target object is null")
-	  		  }
-	  	  }else if(value.getClass() == String.class){
-			  if(!value.toString().equals(delegate.toString())){
-				  throw new VerificationException("expected ${value.toString()} but was ${delegate.toString()}")
-			  }
-		  }else{
-			  if(value != delegate){
-				  throw new VerificationException("expected ${value} but was ${delegate}")
-			  }
-		  }
-	  }
-	  
-	  def isNotEqualTo = { value ->
-		  if(value.getClass() == String.class){
-			  if(value.toString().equals(delegate.toString())){
-				  throw new VerificationException("expected values to differ but both were ${value.toString()}")
-			  }
-		  }else{
-			  if(value == delegate){
-				  throw new VerificationException("expected values to differ but both were ${value}")
-			  }
-		  }
-	  }
-	  
-	  def isA = { type ->
-	  	if(!type.equals(delegate.getClass())){
-	  		throw new VerificationException("expected ${type} but was ${delegate.getClass()}")
-	  	}
-	  }
-	  
-	  def isNotA = {  type ->
-	  	if(type.equals(delegate.getClass())){
-			throw new VerificationException("expected ${type} but was ${delegate.getClass()}")
-		}
-	  }
-	  
-	  def has = { value ->
-	  	  
-		  if(delegate instanceof Map){
-			  if(value instanceof Map){
-				  handleMapContains(delegate, value)
-				  
-			  }else{
-				if(!delegate.containsKey(value)){
-					if(!delegate.containsValue(value)){
-						throw new VerificationException("${delegate.toString()} doesn't contain ${value.toString()} as a key or a value")
-					}
-				}
-		      }
-		   }else{
-		  	if(value instanceof String){
-				  if(!delegate.toString().contains(value.toString())){
-					  throw new VerificationException("${delegate.toString()} doesn't contain ${value.toString()}")
-			  		}
-		 	 }else if(value instanceof Collection){
-				  if(!delegate.containsAll(value)){
-					  throw new VerificationException("${delegate} doesn't contain ${value}")
-			  	}
-		 	 }else if(value instanceof Map){
-		 		def outval =  "Warning! The has expando method isn't working " +
-			  	   "100% with JavaBean-like Objects. ${delegate.toString()} invoking has w/${value} may not work " +
-			  	   "as you intend."
-			  	   println outval
-		 		 //println "helo, delegate is ${delegate}"
-		 		 value.each{ ky, vl ->
-		 		 	//println "${ky}, ${vl}"
-		 		 	//delegate.getDeclaredMethods().each{
-		 		 	//	println it
-		 		 	//}
-		 		 	//delegate.
-		 		 	def fld = delegate.getClass().getDeclaredField(ky)
-		 		 	//println "${fld}"
-		 		 	fld.setAccessible(true)
-		 		 	def ret = fld.get(delegate)
-		 		 	if(ret.getClass() instanceof String){
-		 		 		if(!ret.equals(vl)){
-		 		 			throw new VerificationException("${delegate.getClass().getName()}.${ky} doesn't equal ${vl}")
-		 		 		}
-		 		 	}else{
-		 		 		if(ret != vl){
-		 		 			throw new VerificationException("${delegate.getClass().getName()}.${ky} doesn't equal ${vl}")
-		 		 		}
-		 		 	}
-		 		 }
-		  	 }else{
-				  if(!delegate.contains(value)){
-					  throw new VerificationException("${delegate} doesn't contain ${value}")
-			  	}
-		  	}
-		  }
-	  }
-	  /**
-	   *
-	   */
-	  def handleMapContains = { java.util.LinkedHashMap delegate, java.util.LinkedHashMap values ->
-		def foundcount = 0
-		values.each { key, val ->
-			delegate.each{ vkey, vvalue ->
-				if((vkey.equals(key) && (val == vvalue))){
-					foundcount++
-	 			}
-			}
-		}
-		if(foundcount != values.size()){
-			throw new VerificationException("values ${values} not found in ${delegate}")
-		}
-	  }
-	
-	  Object.metaClass.shouldBe = isEqualTo
-	  Object.metaClass.shouldBeEqual = isEqualTo
-	  Object.metaClass.shouldBeEqualTo = isEqualTo
-	  Object.metaClass.shouldEqual = isEqualTo
-	  
-	  //org.codehaus.groovy.runtime.NullObject.metaClass.shouldBe = isEqualTo
-	  
-	  //these need some renaming
-	  Object.metaClass.is = isEqualTo
-	  Object.metaClass.isnt = isNotEqualTo
-	  Object.metaClass.isNot = isNotEqualTo
-	  
-	  Object.metaClass.shouldNotBe = isNotEqualTo
-	  Object.metaClass.shouldNotEqual = isNotEqualTo
-	  Object.metaClass.shouldntBe = isNotEqualTo
-	  Object.metaClass.shouldntEqual = isNotEqualTo
-	  Object.metaClass.shouldBeA = isA
-	  Object.metaClass.shouldNotBeA = isNotA
-	  Object.metaClass.shouldBeAn = isA
-	  Object.metaClass.shouldNotBeAn = isNotA
-	  Object.metaClass.handleMapContains = handleMapContains
-	  Object.metaClass.shouldHave = has
-	  
-  }
+  
   // TODO change to constants when i break the binding into story and behavior bindings
   public static final String STORY = "story"
   public static final String STORY_SCENARIO = "scenario"
@@ -162,6 +25,9 @@ class SpecificationBinding {
 	 * in the context of behaviors (or stories). 
 	 */
   static Binding getBinding(listener){
+		 
+		
+		 
   	def binding = new Binding()
 
     def basicDelegate = basicDelegate()
@@ -193,11 +59,15 @@ class SpecificationBinding {
     }
 
     binding.it = { spec, closure ->
-      itClosure(spec, closure, BEHAVIOR_IT)
+      use(SpecificationCategory){
+    	  itClosure(spec, closure, BEHAVIOR_IT)
+      }
     }
 
     binding.then = {spec, closure ->
-      itClosure(spec, closure, STORY_THEN)
+    	use(SpecificationCategory){
+    		itClosure(spec, closure, STORY_THEN)
+    	}
     }
         		  
 	binding.when = { whenDescription, closure ->
@@ -213,11 +83,11 @@ class SpecificationBinding {
 	}
 		
 	binding.and = {
-  	  //println "in and!!"
       listener.gotResult(new Result("", AND, Result.SUCCEEDED))
 	}
 	  		  
 	 return binding
+		 
 	}
 
 	/**
