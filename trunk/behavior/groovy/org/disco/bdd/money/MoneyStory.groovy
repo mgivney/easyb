@@ -1,7 +1,7 @@
 package org.disco.bdd.money
 
 
-scenario "two monies of the same currency are added", {
+scenario "two moneys of the same currency are added", {
 	
 	given "one money object is added to another", {
 		total = new Money(12, "CHF").add(new Money(14, "CHF"))
@@ -13,6 +13,6 @@ scenario "two monies of the same currency are added", {
 	
 }
 
-scenario "two monies of different currencies are added", {
+scenario "two moneys of different currencies are added", {
 	
 }
