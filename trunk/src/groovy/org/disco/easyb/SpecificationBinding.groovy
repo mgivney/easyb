@@ -3,8 +3,6 @@ package org.disco.easyb
 import org.disco.easyb.core.delegates.EnsuringDelegate
 import org.disco.easyb.core.result.Result
 import org.disco.easyb.core.delegates.PlugableDelegate
-import org.disco.easyb.core.exception.VerificationException
-import org.codehaus.groovy.runtime.NullObject
 import org.disco.easyb.SpecificationCategory
 
 class SpecificationBinding {
@@ -51,7 +49,9 @@ class SpecificationBinding {
         if(beforeIt != null){
           beforeIt()
         }
-        closure()
+        use(SpecificationCategory){
+          closure()
+        }
         listener.gotResult(new Result(spec, storyPart, Result.SUCCEEDED))
       }catch(ex){
         listener.gotResult(new Result(spec, storyPart, ex))
@@ -59,15 +59,11 @@ class SpecificationBinding {
     }
 
     binding.it = { spec, closure ->
-      use(SpecificationCategory){
     	  itClosure(spec, closure, BEHAVIOR_IT)
-      }
     }
 
     binding.then = {spec, closure ->
-    	use(SpecificationCategory){
     		itClosure(spec, closure, STORY_THEN)
-    	}
     }
         		  
 	binding.when = { whenDescription, closure ->
