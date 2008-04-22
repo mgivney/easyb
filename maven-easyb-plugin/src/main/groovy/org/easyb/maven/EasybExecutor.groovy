@@ -1,6 +1,7 @@
 package org.easyb.maven
 
 import org.codehaus.plexus.util.FileUtils
+import org.apache.maven.plugin.MojoFailureException
 
 public class EasybExecutor {
     EasybMojo mojo
@@ -43,7 +44,7 @@ public class EasybExecutor {
 
         def totalfailed = new XmlParser().parse(mojo.xmlReport).'@totalfailedbehaviors'
         if ('0' != totalfailed)
-            fail("${totalfailed} behaviors failed")
+            throw new MojoFailureException("${totalfailed} behaviors failed")
     }
 
     def String encode(def raw) {
