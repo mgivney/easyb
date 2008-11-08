@@ -1,6 +1,4 @@
-#summary One-sentence summary of this page.
 #labels Featured
-
 = Details =
 
 IBM DeveloperWorks published an easyb tutorial entitled [http://www.ibm.com/developerworks/edu/j-dw-java-easyb-i.html "Drive development with easyb"] which covers collaborating with stakeholders on stories, implementing those stories with easyb and ultimately realizing the benefits of TDD via BDD. 
