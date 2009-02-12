@@ -1,0 +1,13 @@
+#summary Plugin development overivew
+
+= Introduction =
+
+Writing plugins for easyb is simple and primarily involves implementing the EasybPlugin method and declaring your plugin using the service provider pattern defined in the Jar specification.
+
+
+= Details =
+
+To create a plugin for easyb:
+  * Create a class which implements the 
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
