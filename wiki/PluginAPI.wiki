@@ -8,6 +8,6 @@ Writing plugins for easyb is simple and primarily involves implementing the Easy
 = Details =
 
 To create a plugin for easyb:
-  * Create a class which implements the 
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+  * Create a class which implements the org.disco.easyb.plugin.EasybPlugin interface
+  * Create a file name org.disco.easyb.plugin.EasybPlugin and ensure that it is packaged in the META-INF/services directory of the jar created by your build process
+  * This file should contain a single line which is the fully qualified name of your plugin implementation class.
