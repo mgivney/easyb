@@ -1,4 +1,4 @@
-#summary 0.9.5 -- [http://easyb.googlecode.com/files/easyb-0.9.5.tar.gz download it now]!
+#summary 0.9.5 features
 #labels Featured
 
 = What's new=
@@ -20,3 +20,5 @@ At a high level, this version includes:
  * Numerous API improvements along with bug fixes!
   * For instance, the ensureThrows takes a list of exceptions now
  * This version leverages Groovy 1.6.0
+
+[http://easyb.googlecode.com/files/easyb-0.9.5.tar.gz download it now]!
