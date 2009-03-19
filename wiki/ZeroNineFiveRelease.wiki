@@ -1,4 +1,4 @@
-#summary 0.9.5
+#summary 0.9.5 -- [http://easyb.googlecode.com/files/easyb-0.9.5.tar.gz download it now]!
 #labels Featured
 
 = What's new=
