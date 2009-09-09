@@ -30,8 +30,8 @@ class BetterBePlugin extends BasePlugin {
 } 
 }}}
 
-   * Note the name "BetterBe" is defined in the `getName` method of the plug-in -- next, you'll need to create a file called `org.easyb.plugin.EasybPlugin` -- under the covers, easyb uses the `sun.misc.Service` object, which checks a classpath. 
-    # In that file, put a line like so: `org.easyb.plugin.BetterBePlugin`.At run-time, easyb sees the `using` keyword and attempts to load the "BetterBe" plug-in -- if it finds it, it then calls hook methods that correspond to events like `beforeStory`, `beforeThen`, `afterWhen`, etc. 
+   * Note the name "!BetterBe" is defined in the `getName` method of the plug-in -- next, you'll need to create a file called `org.easyb.plugin.EasybPlugin` -- under the covers, easyb uses the `sun.misc.Service` object, which checks a classpath. 
+    # In that file, put a line like so: `org.easyb.plugin.BetterBePlugin`.At run-time, easyb sees the `using` keyword and attempts to load the "!BetterBe" plug-in -- if it finds it, it then calls hook methods that correspond to events like `beforeStory`, `beforeThen`, `afterWhen`, etc. 
    * Finally, to use the new plug-in in a story, simply specify it via the `using` keyword like so:
 {{{
 using "BetterBe"
