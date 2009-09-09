@@ -1,5 +1,4 @@
 #summary 0.9.5 features
-#labels Featured
 
 = What's new=
 
