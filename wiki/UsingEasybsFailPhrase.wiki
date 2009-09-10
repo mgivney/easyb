@@ -1,4 +1,4 @@
-#summary easyb supports explicitly failing a story or specification via the <code>fail</code> phrase
+#summary easyb supports explicitly failing a story or specification via the `fail` phrase
 #labels Cookbook,Featured
 
 Occasionally during the course of writing an easyb story or specification, you might run into a condition that requires a forced failure. That is, based upon some behavior of the code under verification, you might explicitly want easyb to fail a particular scenario. For example, below is a {{{then}}} phrase within a scenario that contains a conditional — if something is true then verify some result; however, if something is false, then force a failure:
