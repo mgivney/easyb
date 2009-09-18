@@ -1,4 +1,3 @@
-#labels Featured,Cookbook
 Configuring Eclipse to run easyb stories is easy!
 
 
