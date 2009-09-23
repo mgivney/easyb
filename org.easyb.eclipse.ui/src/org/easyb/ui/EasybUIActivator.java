@@ -1,5 +1,6 @@
 package org.easyb.ui;
 
+import org.codehaus.groovy.eclipse.editor.GroovyTextTools;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -15,7 +16,8 @@ public class EasybUIActivator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static EasybUIActivator plugin;
-	
+
+	//
 	/**
 	 * The constructor
 	 */
@@ -39,7 +41,7 @@ public class EasybUIActivator extends AbstractUIPlugin {
 		plugin = null;
 		super.stop(context);
 	}
-
+	
 	/**
 	 * Returns the shared instance
 	 *
