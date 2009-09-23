@@ -1,19 +1,19 @@
 package org.easyb.ui.editor;
 
+import org.codehaus.groovy.eclipse.GroovyPlugin;
+import org.codehaus.groovy.eclipse.editor.GroovyEditor;
+import org.codehaus.groovy.eclipse.editor.GroovyTextTools;
+import org.easyb.ui.EasybUIActivator;
+import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
-public class BehaviourEditor extends TextEditor
+public class BehaviourEditor extends GroovyEditor
 {
 	private BehaviourOutlinePage outlinePage = null;
 	
 	public BehaviourEditor(){
-	}
-	
-	protected  void initializeEditor() {
-		super.initializeEditor();
-		setSourceViewerConfiguration(new BehaviourSourceViewerConfiguration(this));
-		//setDocumentProvider(input);
 	}
 	
 	public void updateOutline(){
@@ -40,4 +40,11 @@ public class BehaviourEditor extends TextEditor
 			outlinePage.setInput(null);
 		}
 	}
+	
+	 protected void setPreferenceStore(IPreferenceStore store) {
+		 super.setPreferenceStore(store);
+		 GroovyTextTools textTools= GroovyPlugin.getDefault().getTextTools();
+		 setSourceViewerConfiguration(new BehaviourSourceViewerConfiguration(textTools.getColorManager(),getPreferenceStore(),this));
+	 }
+	 
 }
