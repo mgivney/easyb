@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.easyb.eclipse.templates.manager.TemplateManager;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.internal.ui.text.java.AbstractTemplateCompletionProposalComputer;
+import org.eclipse.jdt.internal.ui.text.template.contentassist.TemplateEngine;
+import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
@@ -15,17 +19,23 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.swt.graphics.Image;
 
-//TODO NOT USED AS USING JavaCompletionComputer INstead
-public class BehaviourCompletionProcessor extends TemplateCompletionProcessor {
+public class BehaviourCompletionProcessor extends AbstractTemplateCompletionProposalComputer {
 	private static final String REGEX= "\\w*";
-	
+
 	@Override
+	protected TemplateEngine computeCompletionEngine(
+			JavaContentAssistInvocationContext context) {
+		// TODO Auto-generated method stub
+		return new BehaviourTemplateEngine(TemplateManager.getInstance().getBehaviourContextType());
+	}
+
+	/*@Override
 	protected TemplateContextType getContextType(ITextViewer viewer,
 			IRegion region) {
 
-		return TemplateManager.getInstance().getBehaviourContextType();
+		return ;
 	}
-
+	
 	@Override
 	protected Image getImage(Template template) {
 		return null;
@@ -81,6 +91,6 @@ public class BehaviourCompletionProcessor extends TemplateCompletionProcessor {
 	protected static boolean isMatch(String keyword,String txt){
 		//TODO handle _
 		return keyword.matches(txt+REGEX);
-	}
+	}*/
 	
 }

@@ -10,13 +10,13 @@
 	</extension>
 
   	<extension
-   			 name="Easyb Code Completions"
+   			 name="BehaviourCodeCompletions"
    			 id="org.codehaus.groovy.eclipse.codeassist.completion.groovy"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
       <javaCompletionProposalComputer
             activate="true"
             categoryId="org.codehaus.groovy.eclipse.codeassist.completion.category"
-            class="org.codehaus.groovy.eclipse.codeassist.completion.jdt.GeneralGroovyCompletionProcessor">
+            class="org.easyb.eclipse.templates.processor.BehaviourCompletionProcessor">
          <partition
                type="__dftl_partition_content_type">
          </partition>
