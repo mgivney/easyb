@@ -15,6 +15,7 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.swt.graphics.Image;
 
+//TODO NOT USED AS USING JavaCompletionComputer INstead
 public class BehaviourCompletionProcessor extends TemplateCompletionProcessor {
 	private static final String REGEX= "\\w*";
 	

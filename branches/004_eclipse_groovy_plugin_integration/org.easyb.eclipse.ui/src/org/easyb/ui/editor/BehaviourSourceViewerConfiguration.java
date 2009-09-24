@@ -1,5 +1,6 @@
 package org.easyb.ui.editor;
 
+import org.easyb.eclipse.templates.processor.BehaviourCompletionProcessor;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +13,7 @@ import org.codehaus.groovy.eclipse.editor.GroovyConfiguration;
 import org.codehaus.groovy.eclipse.editor.GroovyPartitionScanner;
 import org.codehaus.groovy.eclipse.editor.GroovyStringScanner;
 import org.codehaus.groovy.eclipse.editor.GroovyTagScanner;
-import org.easyb.eclipse.templates.processor.BehaviourCompletionProcessor;
+//import org.easyb.eclipse.templates.processor.BehaviourCompletionProcessor;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
@@ -40,10 +41,9 @@ public class BehaviourSourceViewerConfiguration extends GroovyConfiguration{
 			this.tagScanner = new BehaviourTagScanner(colorManager); 
 	}
 	
-	//TODO finish Content assist to restrict types 
-	//of available templates depending on where the 
+	//TODO DELETE 
 	//cursor is in the document
-	@Override
+/*	DONT USE AS USE A JavaCompletionComputer INstead @Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
 		ContentAssistant assistant = (ContentAssistant)super.getContentAssistant(sourceViewer);
 		
@@ -57,7 +57,7 @@ public class BehaviourSourceViewerConfiguration extends GroovyConfiguration{
 		//assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
 		return assistant;
-	}
+	}*/
 	
     @Override
     protected RuleBasedScanner getCodeScanner() {
