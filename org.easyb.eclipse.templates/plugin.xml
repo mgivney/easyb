@@ -9,4 +9,18 @@
 		<include file="resources/templates/behaviour_template.xml"/>
 	</extension>
 
+  	<extension
+   			 name="Easyb Code Completions"
+   			 id="org.codehaus.groovy.eclipse.codeassist.completion.groovy"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.codehaus.groovy.eclipse.codeassist.completion.category"
+            class="org.codehaus.groovy.eclipse.codeassist.completion.jdt.GeneralGroovyCompletionProcessor">
+         <partition
+               type="__dftl_partition_content_type">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
+   
 </plugin>

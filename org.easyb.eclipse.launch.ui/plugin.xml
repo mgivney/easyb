@@ -68,23 +68,7 @@
 	      name="easyb story editor">
 		</editor> 
 	</extension>-->
-	
-	<!--TODO Move to UI plugin-->
-   <extension
-         point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            file-extensions="story"
-            id="org.easyb.eclipse.contenttype.story"
-            name="easyb story"
-            priority="normal">
-      </content-type>
-      <content-type
-            file-extensions="specification"
-            id="org.easyb.eclipse.contenttype.specification"
-            name="easyb specification"
-            priority="normal">
-      </content-type>
-   </extension>
+   
 
    <extension
          point="org.eclipse.ui.commands">
