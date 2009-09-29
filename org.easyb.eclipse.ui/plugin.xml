@@ -107,5 +107,37 @@
       </page>
 	</extension>
    
+   	<!--<extension point="org.eclipse.core.runtime.adapters">
+         <factory 
+            class="org.codehaus.groovy.eclipse.debug.ui.GroovyRetargettableActionAdapterFactory" 
+            adaptableType="org.easyb.ui.editor.BehaviourEditor">
+            <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
+         </factory>-->
+  	<!--	<factory adaptableType="org.eclipse.ui.IFileEditorInput"
+        	class="org.codehaus.groovy.eclipse.adapters.GroovyIFileEditorInputAdapterFactory">
+     		<adapter type="org.codehaus.groovy.ast.ClassNode"/>
+	  	</factory>-->
+   <!-- <factory
+          adaptableType="org.easyb.ui.editor.BehaviourEditor"
+          class="org.codehaus.groovy.eclipse.adapters.GroovyEditorAdapterFactory">
+       <adapter
+             type="org.codehaus.groovy.ast.ModuleNode">
+       </adapter>
+    </factory>-->
+ <!--   </extension>-->
+    
+    <extension
+       point="org.eclipse.ui.editorActions">
+      <editorContribution
+            targetID="org.easyb.ui.editor.BehaviourEditor"
+            id="org.codehaus.groovy.BreakpointRulerActions">
+         <action
+               label="Toggle Breakpoint"
+               class="org.easyb.ui.editor.BehaviourBreakpointRulerActionDelegate"
+               actionID="RulerDoubleClick"
+               id="org.groovy.codehaus.eclipse.ui.actions.ManageBreakpointRulerAction">
+         </action>
+     </editorContribution>
+     </extension>
 	
 </plugin>
