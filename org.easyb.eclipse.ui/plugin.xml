@@ -133,7 +133,7 @@
             id="org.codehaus.groovy.BreakpointRulerActions">
          <action
                label="Toggle Breakpoint"
-               class="org.easyb.ui.editor.BehaviourBreakpointRulerActionDelegate"
+               class="org.codehaus.groovy.eclipse.debug.ui.GroovyBreakpointRulerActionDelegate"
                actionID="RulerDoubleClick"
                id="org.groovy.codehaus.eclipse.ui.actions.ManageBreakpointRulerAction">
          </action>
