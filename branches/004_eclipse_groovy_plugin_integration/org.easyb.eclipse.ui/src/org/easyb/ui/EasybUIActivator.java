@@ -1,6 +1,5 @@
 package org.easyb.ui;
 
-import org.codehaus.groovy.eclipse.editor.GroovyTextTools;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;

@@ -1,20 +1,20 @@
 package org.easyb.ui.editor;
 
-import static org.easyb.ui.editor.KeywordEnum.GIVEN;
-import static org.easyb.ui.editor.KeywordEnum.SCENARIO;
-import static org.easyb.ui.editor.KeywordEnum.WHEN;
-import static org.easyb.ui.editor.KeywordEnum.THEN;
 import static org.easyb.ui.editor.KeywordEnum.AFTER;
 import static org.easyb.ui.editor.KeywordEnum.AFTER_EACH;
+import static org.easyb.ui.editor.KeywordEnum.AND;
 import static org.easyb.ui.editor.KeywordEnum.BEFORE;
 import static org.easyb.ui.editor.KeywordEnum.BEFORE_EACH;
-import static org.easyb.ui.editor.KeywordEnum.IT;
-import static org.easyb.ui.editor.KeywordEnum.AND;
-import static org.easyb.ui.editor.KeywordEnum.ENSURE_THROWS;
-import static org.easyb.ui.editor.KeywordEnum.NARRATIVE;
-import static org.easyb.ui.editor.KeywordEnum.ENSURE;
 import static org.easyb.ui.editor.KeywordEnum.DESCRIPTION;
+import static org.easyb.ui.editor.KeywordEnum.ENSURE;
 import static org.easyb.ui.editor.KeywordEnum.ENSURE_FAILS;
+import static org.easyb.ui.editor.KeywordEnum.ENSURE_THROWS;
+import static org.easyb.ui.editor.KeywordEnum.GIVEN;
+import static org.easyb.ui.editor.KeywordEnum.IT;
+import static org.easyb.ui.editor.KeywordEnum.NARRATIVE;
+import static org.easyb.ui.editor.KeywordEnum.SCENARIO;
+import static org.easyb.ui.editor.KeywordEnum.THEN;
+import static org.easyb.ui.editor.KeywordEnum.WHEN;
 
 import java.util.Arrays;
 

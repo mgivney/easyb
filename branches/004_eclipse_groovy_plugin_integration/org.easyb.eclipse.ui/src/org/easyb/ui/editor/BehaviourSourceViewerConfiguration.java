@@ -1,32 +1,14 @@
 package org.easyb.ui.editor;
 
-import org.easyb.eclipse.templates.processor.BehaviourCompletionProcessor;
-import org.eclipse.jface.text.IAutoEditStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.groovy.eclipse.editor.AutoEnclosingPairStrategy;
-import org.codehaus.groovy.eclipse.editor.GroovyAutoIndentStrategy;
 import org.codehaus.groovy.eclipse.editor.GroovyColorManager;
 import org.codehaus.groovy.eclipse.editor.GroovyConfiguration;
-import org.codehaus.groovy.eclipse.editor.GroovyPartitionScanner;
-import org.codehaus.groovy.eclipse.editor.GroovyStringScanner;
-import org.codehaus.groovy.eclipse.editor.GroovyTagScanner;
-//import org.easyb.eclipse.templates.processor.BehaviourCompletionProcessor;
-import org.eclipse.jdt.ui.text.IColorManager;
-import org.eclipse.jdt.ui.text.IJavaPartitions;
-import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.contentassist.ContentAssistant;
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
-import org.eclipse.jface.text.contentassist.IContentAssistant;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;

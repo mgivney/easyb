@@ -41,7 +41,8 @@
    </extension>
 	
 <!--Note the behaviour content types extend the groovy ones so as 
-	to be included as part of the Groovy Compilaton Model in the Groovy V2 plugin -->
+	to be included as part of the Groovy Compilaton Model in the Groovy V2 plugin
+	org.eclipse.jdt.groovy.core.groovySource -->
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
@@ -49,16 +50,32 @@
             id="org.easyb.eclipse.contenttype.story"
             name="easyb story"
   			base-type="org.eclipse.jdt.groovy.core.groovySource"
-            priority="normal">
+            priority="high">
       </content-type>
       <content-type
             file-extensions="specification"
             id="org.easyb.eclipse.contenttype.specification"
             name="easyb specification"
             base-type="org.eclipse.jdt.groovy.core.groovySource"
-            priority="normal">
+            priority="high">
       </content-type>
    </extension>
+   
+  <!-- <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            file-extensions="story"
+            id="org.easyb.eclipse.contenttype.story"
+            name="easyb story"
+            priority="normal">
+      </content-type>
+      <content-type
+            file-extensions="specification"
+            id="org.easyb.eclipse.contenttype.specification"
+            name="easyb specification"
+            priority="normal">
+      </content-type>
+   </extension>-->
    
    <extension point="org.eclipse.core.filebuffers.documentSetup"
    		name="BehaviourDocumentSetupParticipant"
@@ -94,21 +111,16 @@
          
          <keywordReference id="org.easyb.launch.keyword"/>
       </page>
-      
-		<!-- <page id="org.easyb.ui.preferences.BehaviourTemplatePreferencePage" 
+       <page id="org.easyb.ui.preferences.BehaviourTemplatePreferencePage" 
          	name="Behaviour templates" 
          	class="org.easyb.ui.preferences.BehaviourTemplatePreferencePage"
          	category="org.easyb.ui.preferences.LaunchPreferencePage">
 			
          	<keywordReference id="org.easyb.templates.keyword"/>
-      </page>-->
-       
+      </page>
 	</extension>
 	
-	   <extension 
-       point="org.eclipse.ui.preferencePages"> 
-    
-   </extension>
+
    
 	
 </plugin>

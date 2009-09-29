@@ -4,10 +4,15 @@ import java.io.IOException;
 
 import org.easyb.eclipse.templates.TemplateActivator;
 import org.easyb.eclipse.templates.context.BehaviourContextType;
+import org.easyb.eclipse.templates.processor.BehaviourTemplateProposal;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.Template;
@@ -15,6 +20,7 @@ import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.osgi.service.prefs.BackingStoreException;
@@ -95,5 +101,28 @@ public class TemplateManager {
 		TemplateBuffer buffer = ctx.evaluate(template);
 		
 		return buffer.getString();
+	}
+	
+	public BehaviourTemplateProposal[] getTemplateProposals(ITextViewer viewer,int completionPosition){
+		
+		IDocument document= viewer.getDocument();
+
+		Point selection= viewer.getSelectedRange();
+		Position position= new Position(completionPosition, selection.y);
+		
+		DocumentTemplateContext ctx = new DocumentTemplateContext(getBehaviourContextType(), document,position);
+		
+		int start= ctx.getStart();
+		int end= ctx.getEnd();
+		IRegion region= new Region(start, end - start);
+		
+		Template[] templates = getTemplates();
+		BehaviourTemplateProposal[] proposals = new BehaviourTemplateProposal[templates.length];
+		
+		for(int i = 0;i<templates.length;++i){
+			//TODO add images
+			proposals[i] = new BehaviourTemplateProposal(templates[i],ctx,region,null);
+		}
+		return proposals;
 	}
 }

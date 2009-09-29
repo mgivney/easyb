@@ -1,11 +1,9 @@
 package org.easyb.ui.editor;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.codehaus.groovy.eclipse.editor.GroovyTagScanner;
 import org.eclipse.jdt.ui.text.IColorManager;
-import org.eclipse.jface.text.rules.IRule;
 
 /**
  * Extends the groovy v2 plugin tag scanner by adding additonal 
