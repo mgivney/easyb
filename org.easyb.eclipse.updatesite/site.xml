@@ -3,8 +3,6 @@
    <description name="easby Eclipse Update Site" url="http://easyb.googlecode.com/svn/branches/004_eclipse_groovy_plugin_integration/org.easyb.eclipse.updatesite/">
       easby Eclipse Update Site
    </description>
-   <feature url="features/org.easyb.eclipse.feature_0.0.5.jar" id="org.easyb.eclipse.feature" version="0.0.5">
-      <category name="easyb"/>
-   </feature>
+   <feature url="features/org.easyb.eclipse.feature_0.0.5.jar" id="org.easyb.eclipse.feature" version="0.0.5"/>
    <category-def name="easyb" label="easyb"/>
 </site>
