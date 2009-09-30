@@ -1,9 +1,17 @@
 package org.easyb.ui.editor;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+
 import org.codehaus.groovy.eclipse.GroovyPlugin;
 import org.codehaus.groovy.eclipse.editor.GroovyEditor;
 import org.codehaus.groovy.eclipse.editor.GroovyTextTools;
+import org.easyb.ui.EasybUIActivator;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 public class BehaviourEditor extends GroovyEditor
@@ -21,6 +29,7 @@ public class BehaviourEditor extends GroovyEditor
 		outlinePage.update();
 	}
 	
+	@Override
 	public Object getAdapter(Class required) {
 		if (IContentOutlinePage.class.equals(required)) {
 			if (outlinePage == null) {
@@ -34,6 +43,21 @@ public class BehaviourEditor extends GroovyEditor
 		return super.getAdapter(required);
 	}
 	
+	//GroovyEditor overrides this so we need to do the 
+	//same to get the easyb image
+    @Override
+    public Image getTitleImage() {
+    	Image image = 
+    		EasybUIActivator.getDefault().getImageRegistry().get(EasybUIActivator.EASYB_ICON_IMAGE); 
+    	
+    	if(image!=null){
+    		return image;
+    	}
+    	
+    	return super.getTitleImage();
+    }
+    
+	
 	@Override
 	public void dispose(){
 		super.dispose();
@@ -42,6 +66,7 @@ public class BehaviourEditor extends GroovyEditor
 		}
 	}
 	
+	@Override
 	 protected void setPreferenceStore(IPreferenceStore store) {
 		 super.setPreferenceStore(store);
 		 GroovyTextTools textTools= GroovyPlugin.getDefault().getTextTools();

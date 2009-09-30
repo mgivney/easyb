@@ -32,7 +32,6 @@
          point="org.eclipse.ui.editors">
       <editor
             name="Behaviour editor"
-            icon="resources/images/icons/easyb.png"
             extensions="story,specification"
             contributorClass="org.easyb.ui.editor.BehaviourActionContributor"
             class="org.easyb.ui.editor.BehaviourEditor"
@@ -41,6 +40,7 @@
       </editor>
    </extension>
 	
+ 
 <!--Note the behaviour content types extend the groovy ones so as 
 	to be included as part of the Groovy Compilaton Model in the Groovy V2 plugin
 	  			base-type="org.eclipse.jdt.groovy.core.groovySource" -->
