@@ -11,6 +11,7 @@ import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
+import org.eclipse.jface.text.BadLocationException;
 
 /**
  * Calculates Behaviour completion proposals 
@@ -32,7 +33,7 @@ public class BehaviourTemplateCompletionProposalComputer implements IJavaComplet
 
 		BehaviourTemplateProposal[] templateProposals= 
 			TemplateManager.getInstance().getTemplateProposals(javaContext.getViewer(),javaContext.getInvocationOffset());
-
+		
 		IJavaCompletionProposal[] keyWordResults= javaContext.getKeywordProposals();
 		
 		if (keyWordResults.length == 0){
