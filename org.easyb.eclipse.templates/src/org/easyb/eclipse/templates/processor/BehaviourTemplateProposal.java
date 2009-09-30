@@ -39,7 +39,6 @@ public class BehaviourTemplateProposal extends TemplateProposal{
 		final int R_INLINE_TAG = 31;
 
 		int base= R_DEFAULT + R_INTERESTING + R_NON_RESTRICTED;
-
 		try {
 			if (context instanceof DocumentTemplateContext) {
 				DocumentTemplateContext templateContext= (DocumentTemplateContext) context;
