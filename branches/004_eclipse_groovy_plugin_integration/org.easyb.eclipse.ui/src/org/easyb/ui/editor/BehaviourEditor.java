@@ -13,7 +13,11 @@ public class BehaviourEditor extends GroovyEditor
 	public BehaviourEditor(){
 	}
 	
-	public void updateOutline(){
+	//Called from the reconciler which runs as a background task
+	//so made the whole method synchronized. If extra 
+	//code is added to the updateOutline which is on the stack 
+	//then change to lock an object rather then whole method
+	public synchronized void updateOutline(){
 		outlinePage.update();
 	}
 	

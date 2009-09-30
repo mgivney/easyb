@@ -4,7 +4,7 @@
    <!--Launch Config -->
    <extension point="org.eclipse.debug.core.launchConfigurationTypes">
 	    <launchConfigurationType
-	        name="Easyb Story"
+	        name="Easyb Behaviour"
 	        delegate="org.easyb.launch.launcher.BehaviourLaunchConfigurationDelegate"
 	        modes="run, debug"               
 	        id="org.easyb.launch.launcher.BehaviourLaunchConfigurationDelegate">        
@@ -32,7 +32,7 @@
 	   <Shortcut
 	      id="org.easyb.launch.launcher.BehaviourLaunchShortcut"
 	      class="org.easyb.launch.launcher.BehaviourLaunchShortcut"
-	 		label="easyb story"
+	 		label="easyb behaviour"
 	 		icon="resources/images/icons/easyb.png"
 	 		modes="run, debug">
  
