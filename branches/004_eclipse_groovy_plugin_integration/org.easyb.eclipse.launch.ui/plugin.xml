@@ -68,8 +68,8 @@
 	      name="easyb story editor">
 		</editor> 
 	</extension>-->
-   
 
+   
    <extension
          point="org.eclipse.ui.commands">
       <command 
