@@ -31,6 +31,9 @@ public class Behaviour implements IModelElement{
 	 */
 	public void createModel(IDocument document) throws PartitionModelException {
 		try {
+			//Clear all existing elements in the model
+		    clear();
+			
 			if(document==null){
 				return;
 			}
