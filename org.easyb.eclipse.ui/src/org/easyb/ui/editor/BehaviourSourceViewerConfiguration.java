@@ -50,9 +50,9 @@ public class BehaviourSourceViewerConfiguration extends GroovyConfiguration{
 	public IReconciler getReconciler(ISourceViewer sourceViewer){
 
 
-		IReconciler bReconciler = 
+		MonoReconciler bReconciler = 
 			new MonoReconciler(new BehaviourReconcilerStrategy((BehaviourEditor)textEditor),false); 
-	
+		bReconciler.setIsAllowedToModifyDocument(false);
 		
 		return new CompositeReconciler(super.getReconciler(sourceViewer),bReconciler);
 	}
