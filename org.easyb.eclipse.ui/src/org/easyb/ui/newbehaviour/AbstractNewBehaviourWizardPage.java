@@ -1,5 +1,6 @@
 package org.easyb.ui.newbehaviour;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 
 import org.easyb.ui.EasybUIActivator;
@@ -36,6 +37,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 
 public abstract class AbstractNewBehaviourWizardPage extends WizardPage{
+	private static final String SOURCE_PACKAGE_TEXT = "package"; 
 	private Label lblSource;
 	private Text txtSource;
 	private Button btnSource;
@@ -152,7 +154,10 @@ public abstract class AbstractNewBehaviourWizardPage extends WizardPage{
 			return null;
 		}
 		
-		String pattern = getTemplatePattern();
+		String text = getSourcePackageText() +
+						System.getProperty("line.separator")+
+						getTemplatePattern();
+		
 		String fileName =getFileName()+"."+getFileExtension();
 		IFile file = null;
 		if(isPackageSet()){
@@ -175,7 +180,7 @@ public abstract class AbstractNewBehaviourWizardPage extends WizardPage{
 		
 		//TODO pass a progress montior
 		try{
-			file.create(new ByteArrayInputStream(pattern.getBytes()), false,null);
+			file.create(new ByteArrayInputStream(text.getBytes()), false,null);
 			return file;
 		}catch(CoreException cex){
 			setErrorMessage("Unable to create behaviour, check error log for details");
@@ -184,7 +189,16 @@ public abstract class AbstractNewBehaviourWizardPage extends WizardPage{
 	
 		return null;
 	}
-	 
+	
+	protected String getSourcePackageText(){
+		IJavaElement pckg = getPackage();
+		if(pckg==null){
+			return "";
+		}
+		
+		return SOURCE_PACKAGE_TEXT+" "+pckg.getElementName();
+	}
+	
 	protected IJavaElement getSourceFolder(){
 		return sourceFolder;
 	}
