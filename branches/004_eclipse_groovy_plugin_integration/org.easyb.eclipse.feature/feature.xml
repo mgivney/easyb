@@ -11,12 +11,12 @@ Built on the groovy eclipse plugin http://groovy.codehaus.org/Eclipse+Plugin
    </description>
 
    <copyright url="http://www.easyb.org">
-      Copyright (c) 2009 Andrew Glover,Darran White
+      Copyright (c) 2009 www.easyb.org
    </copyright>
 
    <license url="http://www.opensource.org/licenses/mit-license.php">
       The MIT License
-Copyright (c) 2009 Andrew Glover,Darran White
+Copyright (c) 2009 www.easyb.org
 Permission is hereby granted, free of charge, to any person obtaining
 a copy
 of this software and associated documentation files (the &quot;Software&quot;),
@@ -77,6 +77,13 @@ THE SOFTWARE.
    </requires>
 
    <plugin
+         id="org.easyb.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.easyb.launch.ui"
          download-size="0"
          install-size="0"
@@ -85,13 +92,6 @@ THE SOFTWARE.
 
    <plugin
          id="org.easyb.templates"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.easyb.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
