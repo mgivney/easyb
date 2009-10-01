@@ -1,6 +1,7 @@
-package org.easyb.ui.editor;
+package org.easyb.ui.editor.reconciler;
 
 import org.easyb.ui.EasybUIActivator;
+import org.easyb.ui.editor.BehaviourEditor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;

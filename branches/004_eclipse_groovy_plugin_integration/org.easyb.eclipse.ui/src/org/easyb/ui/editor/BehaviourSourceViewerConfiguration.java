@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.codehaus.groovy.eclipse.editor.GroovyColorManager;
 import org.codehaus.groovy.eclipse.editor.GroovyConfiguration;
+import org.easyb.ui.editor.reconciler.BehaviourReconcilerStrategy;
+import org.easyb.ui.editor.reconciler.CompositeReconciler;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
@@ -22,24 +24,6 @@ public class BehaviourSourceViewerConfiguration extends GroovyConfiguration{
 			this.textEditor = textEditor;
 			this.tagScanner = new BehaviourTagScanner(colorManager); 
 	}
-	
-	//TODO DELETE 
-	//cursor is in the document
-/*	DONT USE AS USE A JavaCompletionComputer INstead @Override
-	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
-		ContentAssistant assistant = (ContentAssistant)super.getContentAssistant(sourceViewer);
-		
-	//	ContentAssistant assistant= new ContentAssistant();
-	//	assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-
-		IContentAssistProcessor processor= new BehaviourCompletionProcessor();
-		assistant.setContentAssistProcessor(processor, IDocument.DEFAULT_CONTENT_TYPE);
-
-		//assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_ABOVE);
-		//assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
-
-		return assistant;
-	}*/
 	
     @Override
     protected RuleBasedScanner getCodeScanner() {
@@ -65,10 +49,11 @@ public class BehaviourSourceViewerConfiguration extends GroovyConfiguration{
 	@Override
 	public IReconciler getReconciler(ISourceViewer sourceViewer){
 
-		//Todo change editor to implement a listener interface 
-		//rather then doing this nasty cast
-		IReconciler reconciler = 
+
+		IReconciler bReconciler = 
 			new MonoReconciler(new BehaviourReconcilerStrategy((BehaviourEditor)textEditor),false); 
-		return reconciler;	
+	
+		
+		return new CompositeReconciler(super.getReconciler(sourceViewer),bReconciler);
 	}
 }
