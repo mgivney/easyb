@@ -163,6 +163,11 @@ public abstract class AbstractNewBehaviourWizardPage extends WizardPage{
 			file = srcfolder.getFile(fileName);
 		}
 		
+		if(file == null){
+			setErrorMessage("File "+fileName+"could not be created");
+			return null;
+		}
+		
 		if(file.exists()){
 			setErrorMessage("File "+fileName+"already exists");
 			return null;
