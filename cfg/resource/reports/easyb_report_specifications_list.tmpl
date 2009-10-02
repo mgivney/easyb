@@ -38,7 +38,7 @@
         <td colspan='5'>
           <table class='componentsForSpecificationTable'>
             <tbody>
-             <% specificationStep.childSteps.each { componentStep -> %>
+             <% specificationStep.childStepsSkipExecute.each { componentStep -> %>
               <tr>
                 <td>${componentStep.stepType.type} ${componentStep.name}</td>
                 <td class='${HtmlReportHelper.getStepStatusClass(componentStep.result)}' style='text-align:right;'>${componentStep.result?.status != null ? componentStep.result?.status : ""}</td>
@@ -46,7 +46,7 @@
               <% if (componentStep.result?.failed()) { %>
               <tr>
                 <td colspan='2' style='color:red; padding-left: 1cm;'>
-                  <strong>${componentStep.result.cause()?.getMessage()}</strong>
+                  <strong>${componentStep.result.cause()?.getClass().getName()}: ${componentStep.result.cause()?.getMessage()}</strong>
                   <% for (i in 1..10) { %>
                    <br />${componentStep.result.cause()?.getStackTrace()[i]}
                   <% } %>
