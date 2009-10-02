@@ -388,6 +388,10 @@ public abstract class AbstractNewBehaviourWizardPage extends WizardPage{
 					updatePackage(jElement);
 					break;
 				}
+				case IJavaElement.COMPILATION_UNIT:{
+					updateSourceFolder(jElement.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT));
+					updatePackage(jElement.getAncestor(IJavaElement.PACKAGE_FRAGMENT));
+				}
 			}	
 			
 			if(isSourceFolderEmpty()){
