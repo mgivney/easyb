@@ -28,6 +28,11 @@ public class BehaviourTemplateCompletionProposalComputer implements IJavaComplet
 
 		JavaContentAssistInvocationContext javaContext= (JavaContentAssistInvocationContext) context;
 		ICompilationUnit unit= javaContext.getCompilationUnit();
+		
+		//TODO when a EasybCompilationUnit can be added filter here 
+		//so only stories/specifications have templates resolved not 
+		//JAva or Groovy
+		
 		if (unit == null)
 			return Collections.EMPTY_LIST;
 
