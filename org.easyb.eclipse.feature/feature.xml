@@ -2,7 +2,7 @@
 <feature
       id="org.easyb.eclipse.feature"
       label="Easyb Eclipse Feature"
-      version="0.0.6"
+      version="0.0.7"
       provider-name="easyb.org">
 
    <description url="http://www.easyb.org">
@@ -75,13 +75,6 @@ THE SOFTWARE.
    </requires>
 
    <plugin
-         id="org.easyb.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.easyb.launch.ui"
          download-size="0"
          install-size="0"
@@ -90,6 +83,13 @@ THE SOFTWARE.
 
    <plugin
          id="org.easyb.templates"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.easyb.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
