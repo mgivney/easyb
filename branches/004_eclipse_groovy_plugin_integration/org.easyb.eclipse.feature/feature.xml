@@ -2,7 +2,7 @@
 <feature
       id="org.easyb.eclipse.feature"
       label="Easyb Eclipse Feature"
-      version="0.0.7"
+      version="0.0.8"
       provider-name="easyb.org">
 
    <description url="http://www.easyb.org">
@@ -90,7 +90,6 @@ THE SOFTWARE.
          id="org.easyb.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>
