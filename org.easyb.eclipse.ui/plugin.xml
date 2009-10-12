@@ -139,5 +139,22 @@
          </action>
      </editorContribution>
      </extension>
+     
+  <!--  <extension
+          point="org.eclipse.jdt.groovy.core.compilationUnitTargets"
+          id="org.easyb.compilationunit.easybCompilationUnitTargets"
+   		  name="Easyb Compilation Units">
+       <compilationUnitTarget
+             class="org.easyb.ui.compilationunit.EasybCompilationUnitTarget"
+             contentTypeId="org.easyb.eclipse.contenttype.story"
+             id="org.easyb.ui.compilationunit.target.story">
+       </compilationUnitTarget>
+       <compilationUnitTarget
+             class="org.easyb.ui.compilationunit.EasybCompilationUnitTarget"
+             contentTypeId="org.easyb.eclipse.contenttype.specification"
+             id="org.easyb.ui.compilationunit.target.specification">
+       </compilationUnitTarget>
+    </extension>-->
+     
 	
 </plugin>
