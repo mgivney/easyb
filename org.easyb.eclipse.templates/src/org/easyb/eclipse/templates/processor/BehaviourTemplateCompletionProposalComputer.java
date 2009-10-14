@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.easyb.eclipse.templates.TemplateActivator;
 import org.easyb.eclipse.templates.manager.TemplateManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
@@ -29,13 +31,22 @@ public class BehaviourTemplateCompletionProposalComputer implements IJavaComplet
 		JavaContentAssistInvocationContext javaContext= (JavaContentAssistInvocationContext) context;
 		ICompilationUnit unit= javaContext.getCompilationUnit();
 		
+		if (unit == null){
+			return Collections.EMPTY_LIST;
+		}
+
 		//TODO when a EasybCompilationUnit can be added filter here 
 		//so only stories/specifications have templates resolved not 
-		//JAva or Groovy
-		
-		if (unit == null)
+		//Java or Groovy compilation units
+		try {
+			if(!TemplateActivator.getDefault().isBehaviourFile(unit.getCorrespondingResource())){
+				return Collections.EMPTY_LIST;
+			}
+		} catch (JavaModelException e) {
+			TemplateActivator.Log("Unable to check if resouce is a easyb behaviour",e);
 			return Collections.EMPTY_LIST;
-
+		}
+		
 		BehaviourTemplateProposal[] templateProposals= 
 			TemplateManager.getInstance().getTemplateProposals(javaContext.getViewer(),javaContext.getInvocationOffset());
 		
