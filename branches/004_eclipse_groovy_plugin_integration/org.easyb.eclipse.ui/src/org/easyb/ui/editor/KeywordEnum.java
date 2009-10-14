@@ -89,8 +89,39 @@ public  enum KeywordEnum {
 	HAS(){
 		@Override public String toString(){
 			return "has"; 
-		}
-	};
+		}},
+	SHARED(){
+		@Override public String toString(){
+			return "shared"; 
+		}},
+     BEHAVIOUR(){
+			@Override public String toString(){
+				return "behavior"; 
+			}},
+	BEHAVES(){
+				@Override public String toString(){
+					return "behaves"; 
+				}},
+	A(){
+		@Override public String toString(){
+			return "a"; 
+		}},
+	I(){
+		@Override public String toString(){
+			return "i"; 
+		}},
+	SO(){
+		@Override public String toString(){
+			return "so"; 
+		}},
+	THAT(){
+		@Override public String toString(){
+			return "that"; 
+		}},
+	WANT(){
+		@Override public String toString(){
+			return "want"; 
+		}};
 	
 	public static String[] toStringArray(){
 		return new String[]{
@@ -108,7 +139,15 @@ public  enum KeywordEnum {
 				ENSURE_THROWS.toString(),
 				DESCRIPTION.toString(),
 				ENSURE.toString(),
-				ENSURE_FAILS.toString()
+				ENSURE_FAILS.toString(),
+				SHARED.toString(),
+				BEHAVIOUR.toString(),
+				BEHAVES.toString(),
+				A.toString(),
+				I.toString(),
+				SO.toString(),
+				THAT.toString(),
+				WANT.toString()
 		};
 	}
 }
