@@ -51,7 +51,7 @@ public class Behaviour implements IModelElement{
 				
 				TypedPosition typePos = (TypedPosition)pos;
 				
-				if(isSpecification(typePos)){
+				if(isRootStatement(typePos)){
 					lastSpec = new Statement();
 					lastSpec.update(typePos, document,this);
 					roots.add(lastSpec);
@@ -79,12 +79,23 @@ public class Behaviour implements IModelElement{
 	}
 	
 	private boolean isStatement(TypedPosition typePos){
-		return Arrays.binarySearch(PartitionScannerBuilder.EASYB_STATEMENT_PARTITION_TYPES,typePos.getType())>=0;
+		for(String type : PartitionScannerBuilder.EASYB_STATEMENT_PARTITION_TYPES){
+			if(typePos!=null && type.equals(typePos.getType())){
+				return true;
+			}
+		}
+		return false;	
 	}
 	
-	private boolean isSpecification(TypedPosition typePos){
-		return Arrays.binarySearch(PartitionScannerBuilder.EASYB_ROOT_PARTITION_TYPES,typePos.getType())>=0;
+	private boolean isRootStatement(TypedPosition typePos){
+		for(String type : PartitionScannerBuilder.EASYB_ROOT_PARTITION_TYPES){
+			if(typePos!=null && type.equals(typePos.getType())){
+				return true;
+			}
+		}
+		return false;
 	}
+
 
 	@Override
 	public boolean hasChildren(){

@@ -15,15 +15,27 @@ import static org.easyb.ui.editor.KeywordEnum.NARRATIVE;
 import static org.easyb.ui.editor.KeywordEnum.SCENARIO;
 import static org.easyb.ui.editor.KeywordEnum.THEN;
 import static org.easyb.ui.editor.KeywordEnum.WHEN;
+import static org.easyb.ui.editor.KeywordEnum.SHARED;
+import static org.easyb.ui.editor.KeywordEnum.A;
+import static org.easyb.ui.editor.KeywordEnum.I;
+import static org.easyb.ui.editor.KeywordEnum.SO;
+import static org.easyb.ui.editor.KeywordEnum.THAT;
+import static org.easyb.ui.editor.KeywordEnum.WANT;
+import static org.easyb.ui.editor.KeywordEnum.BEHAVES;
+import static org.easyb.ui.editor.KeywordEnum.BEHAVIOUR;
 
 import java.util.Arrays;
 
 import org.eclipse.jface.text.rules.EndOfLineRule;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.PatternRule;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WordRule;
 
 /**
  * Constructs a partition scanner to be used to 
@@ -42,6 +54,7 @@ public class PartitionScannerBuilder {
 	public final static String EASYB_BEHAVIOUR_NARRATIVE_START = "__easyb_behaviour_narrative_start";
 	public final static String EASYB_BEHAVIOUR_IT_START = "__easyb_behaviour_it_start";
 	public final static String EASYB_BEHAVIOUR_DESCRIPTION_START = "__easyb_behaviour_description";
+	public final static String EASYB_BEHAVIOUR_SHARED_START = "__easyb_behaviour_shared";
 	public final static String EASYB_BEHAVIOUR_BEFORE_START = "__easyb_behaviour_before_start";
 	public final static String EASYB_BEHAVIOUR_BEFORE_EACH_START = "__easyb_behaviour_before_each_start";
 	public final static String EASYB_BEHAVIOUR_AFTER_START ="__easyb_behaviour_after_start";
@@ -49,6 +62,10 @@ public class PartitionScannerBuilder {
 	public final static String EASYB_BEHAVIOUR_ENSURE_THROWS_START = "__easyb_behaviour_ensure_throws_start";
 	public final static String EASYB_BEHAVIOUR_ENSURE_START = "__easyb_behaviour_ensure_start";
 	public final static String EASYB_BEHAVIOUR_ENSURE_FAILS_START = "__easyb_behaviour_ensure_fails_start";
+	public final static String EASYB_BEHAVIOUR_IT_BEHAVES_AS_START = "__easyb_behaviour_it_behaves_as";
+	public final static String EASYB_BEHAVIOUR_AS_A_START = "__easyb_behaviour_as_a";
+	public final static String EASYB_BEHAVIOUR_I_WANT_START = "__easyb_behaviour_i_want";
+	public final static String EASYB_BEHAVIOUR_SO_THAT_START = "__easyb_behaviour_so_that";
 	
 	public static final String[] EASYB_STATEMENT_PARTITION_TYPES = new String[]{
 		EASYB_BEHAVIOUR_GIVEN_START,
@@ -57,18 +74,23 @@ public class PartitionScannerBuilder {
 		EASYB_BEHAVIOUR_AND_START,
 		EASYB_BEHAVIOUR_ENSURE_THROWS_START,
 		EASYB_BEHAVIOUR_ENSURE_START,
-		EASYB_BEHAVIOUR_ENSURE_FAILS_START
+		EASYB_BEHAVIOUR_ENSURE_FAILS_START,
+		EASYB_BEHAVIOUR_IT_BEHAVES_AS_START,
+		EASYB_BEHAVIOUR_AS_A_START,
+		EASYB_BEHAVIOUR_I_WANT_START,
+		EASYB_BEHAVIOUR_SO_THAT_START
 	};
 	
 	public static final String[] EASYB_ROOT_PARTITION_TYPES = new String[]{
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_SCENARIO_START,
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_BEFORE_START,
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_BEFORE_EACH_START,
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_AFTER_START,
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_AFTER_EACH_START,
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_IT_START,
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_NARRATIVE_START,
-		PartitionScannerBuilder.EASYB_BEHAVIOUR_DESCRIPTION_START
+		EASYB_BEHAVIOUR_SCENARIO_START,
+		EASYB_BEHAVIOUR_BEFORE_START,
+		EASYB_BEHAVIOUR_BEFORE_EACH_START,
+		EASYB_BEHAVIOUR_AFTER_START,
+		EASYB_BEHAVIOUR_AFTER_EACH_START,
+		EASYB_BEHAVIOUR_IT_START,
+		EASYB_BEHAVIOUR_NARRATIVE_START,
+		EASYB_BEHAVIOUR_DESCRIPTION_START,
+		EASYB_BEHAVIOUR_SHARED_START
 	};
 	
 	public static final String[] EASYB_ALL_PARTITION_TYPES = 
@@ -98,59 +120,68 @@ public class PartitionScannerBuilder {
 	}
 	
 	private static IPredicateRule[] createPredicateRules(){
-		IPredicateRule[] rules = new IPredicateRule[18];
-		
-		// Add rule for single line comments.
-		rules[0] = new EndOfLineRule("//", Token.UNDEFINED);
+		IPredicateRule[] rules = new IPredicateRule[20];
 
-		// Add rule for strings and character constants.
-		rules[1] = new SingleLineRule("\"", "\"", Token.UNDEFINED, '\\'); 
-		rules[2] = new SingleLineRule("'", "'", Token.UNDEFINED, '\\'); 
-		
 		//Add rule for scenario start
-		rules[3] = new MultiLineRule(SCENARIO.toString(),"{",new Token(EASYB_BEHAVIOUR_SCENARIO_START));
+		rules[0] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_SCENARIO_START),SCENARIO.toString());
 		
 		//Add rule for given
-		rules[4] = new MultiLineRule(GIVEN.toString(),"{",new Token(EASYB_BEHAVIOUR_GIVEN_START));
+		rules[1] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_GIVEN_START),GIVEN.toString());
 		
 		//Add rule for when
-		rules[5] = new MultiLineRule(WHEN.toString(),"{",new Token(EASYB_BEHAVIOUR_WHEN_START));
+		rules[2] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_WHEN_START),WHEN.toString());
 		
 		//Add rule for then
-		rules[6] = new 	MultiLineRule(THEN.toString(),"{",new Token(EASYB_BEHAVIOUR_THEN_START));
+		rules[3] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_THEN_START),THEN.toString());
 		
 		//Add rule for and
-		rules[7] = new 	MultiLineRule(AND.toString(),"{",new Token(EASYB_BEHAVIOUR_AND_START));
+		rules[4] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_AND_START),AND.toString());
 		
 		//Add rule for narrative
-		rules[8] = new MultiLineRule(NARRATIVE.toString(),"{",new Token(EASYB_BEHAVIOUR_NARRATIVE_START));
-		
-		//Add rule for it
-		rules[9] = new MultiLineRule(IT.toString(),"{",new Token(EASYB_BEHAVIOUR_IT_START));
+		rules[5] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_BEFORE_START),NARRATIVE.toString());
 		
 		//Add rule for before 
-		rules[10] = new MultiLineRule(BEFORE.toString(),"{",new Token(EASYB_BEHAVIOUR_BEFORE_START));
+		rules[6] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_BEFORE_START),BEFORE.toString());
 		
 		//Add rule for before_each 
-		rules[11] = new MultiLineRule(BEFORE_EACH.toString(),"{",new Token(EASYB_BEHAVIOUR_BEFORE_EACH_START));
+		rules[7] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_BEFORE_EACH_START),BEFORE_EACH.toString());
 		
 		//Add rule for after 
-		rules[12] = new MultiLineRule(AFTER.toString(),"{",new Token(EASYB_BEHAVIOUR_AFTER_START));
+		rules[8] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_AFTER_START),AFTER.toString());
 		
 		//Add rule for after_each 
-		rules[13] = new MultiLineRule(AFTER_EACH.toString(),"{",new Token(EASYB_BEHAVIOUR_AFTER_EACH_START));
+		rules[9] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_AFTER_EACH_START),AFTER_EACH.toString());
 		
 		//Add rule for ensure throws
-		rules[14] = new MultiLineRule(ENSURE_THROWS.toString(),"{",new Token(EASYB_BEHAVIOUR_ENSURE_THROWS_START));
+		rules[10] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_ENSURE_START),ENSURE_THROWS.toString());
 		
 		//Add rule for ensure 
-		rules[15] = new MultiLineRule(ENSURE.toString(),"{",new Token(EASYB_BEHAVIOUR_ENSURE_START));
+		rules[11] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_ENSURE_START),ENSURE.toString());
 		
 		//Add rule for ensure fails 
-		rules[16] = new MultiLineRule(ENSURE_FAILS.toString(),"{",new Token(EASYB_BEHAVIOUR_ENSURE_FAILS_START));
+		rules[12] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_ENSURE_FAILS_START),ENSURE_FAILS.toString());
 		
 		//Add rule for description
-		rules[17] = new MultiLineRule(DESCRIPTION.toString(),"{",new Token(EASYB_BEHAVIOUR_DESCRIPTION_START));
+		rules[13] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_DESCRIPTION_START),DESCRIPTION.toString());
+		
+		//Add rule for shared
+		rules[14] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_SHARED_START),SHARED.toString(),BEHAVIOUR.toString());
+	
+		//Add rule for "it behaves as" escape whitespace 
+		rules[15] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_IT_BEHAVES_AS_START),IT.toString(),BEHAVES.toString(),"as");
+		
+		//Add rule for it
+		rules[16] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_IT_START),IT.toString());
+		
+		//Add rule for narrative "as a"
+		rules[17] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_AS_A_START),"as",A.toString());
+		
+		//Add rule for narrative "i want"
+		rules[18] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_I_WANT_START),I.toString(),WANT.toString());
+		
+		//Add rule for narrative "i want"
+		rules[19] = new BehaviourWordRule(new Token(EASYB_BEHAVIOUR_I_WANT_START),SO.toString(),THAT.toString());
+		
 		return rules;
 	}
 }
