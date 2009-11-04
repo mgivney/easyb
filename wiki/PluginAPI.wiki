@@ -1,5 +1,5 @@
 #summary Plug-in development overview
-#labels Cookbook,Featured
+#labels Cookbook
 
 = Introduction =
 
