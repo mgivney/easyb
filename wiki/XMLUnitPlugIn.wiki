@@ -1,6 +1,4 @@
-#summary how to use the XMLUnit plug-in
 #labels Featured,Cookbook
-
 = Using the XMLUnit easyb plug-in=
 
 There’s myriad ways to validate XML; in fact, with Groovy, the mechanics of parsing XML with {{{XMLSlurper}}} couldn’t be easier! Nevertheless, from time to time, you might have needed an easy way to validate XML documents without having to actually parse them. Thus, [http://www.ibm.com/developerworks/java/library/j-cq121906.html XMLUnit] has been a handy framework today as it has been for years.
