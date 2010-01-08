@@ -1,2 +1,0 @@
-scenario "Test  scenario"{
-}
