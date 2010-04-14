@@ -1,5 +1,4 @@
 #summary of 0.9.6 features
-#labels Featured
 
 
 = What's new=
