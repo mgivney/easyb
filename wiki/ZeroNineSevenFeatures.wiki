@@ -1,7 +1,7 @@
 #summary 0.9.7 features
 #labels Featured
 
-= What's in 0.9.7 =
+= What's in easyb 0.9.7 =
 
 easyb's 0.9.7 release contains the following features and fixes:
 
