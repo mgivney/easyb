@@ -19,4 +19,6 @@ easyb's 0.9.7 release contains the following features and fixes:
 
 Plus, there are fixes to the IntelliJ plugin; not to mention we now have an Eclipse plugin! Lastly, there have been various changes to easyb.org. 
 
+Download [http://easyb.googlecode.com/files/easyb-0.9.7.tar.gz easyb 0.9.7] today!
+
 Thanks again for everyone's help and enthusiasm! 
