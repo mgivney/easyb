@@ -112,6 +112,9 @@ target("publish-easyb": "uploads easyb distribution to googlecode") {
 target("compile-all": "compile Groovy & Java classes") {
   depends("compile-core")
   depends("compile-behaviors")
+  copy(todir: classdir) {
+    fileset(dir: gsourcedir, includes: "**/*.properties")
+  }
 }
 
 target("compile-core": "compile Groovy & Java classes in easyb core") {
@@ -132,6 +135,55 @@ target("validate": "runs and validates both, behaviors and reports") {
   depends("validate-behaviors")
   depends("validate-reports")
 }
+
+target("validate-french-behaviors": "runs and validates the easyb behaviors") {
+  depends(jar)
+
+  ant.taskdef(name: "easyb", classname: "org.easyb.ant.BehaviorRunnerTask") {
+    classpath() {
+      pathelement(location: "${defaultdir}/easyb-${version}.jar")
+    }
+  }
+
+  ant.easyb(failureProperty: "easyb.failed", failureFile: "${defaultdir}/failures.txt") {
+
+    classpath() {
+      fileset(dir: libdir, includes: jarincludes)
+      pathelement(location: "${defaultdir}/easyb-${version}.jar")
+      pathelement(location: behaviorclassdir)
+    }
+
+    report(location: "${reportsoutputdir}/easyb-report-fr.html", format: "html")
+    report(location: "${reportsoutputdir}/easyb-report-fr.xml", format: "xml")
+    report(location: "${reportsoutputdir}/story-report-fr.txt", format: "txtstory")
+    report(location: "${reportsoutputdir}/specification-report-fr.txt", format: "txtspecification")
+
+
+    behaviors(dir: gbehaviordir) {
+
+      if (ant.project.properties."behavior" != null) {
+        include(name: "**/${ant.project.properties.'behavior'}.*")
+      } else {
+
+        include(name: "**/*_fr_Story.groovy")
+        include(name: "**/*_fr.story")
+        include(name: "**/*_fr_Specification.groovy")
+        include(name: "**/*_fr.specification")
+
+        exclude(name: "**/TextStoryReportingValidation.story")
+        exclude(name: "**/FailureReport.story")
+        exclude(name: "**/PassingPendingFailingStory.story")
+        exclude(name: "**/PassingPendingFailing.specification")
+        exclude(name: "**/ExceptionalOccurrence.story")
+        exclude(name: "**/HtmlReportingStory.groovy")
+        exclude(name: "**/Issue116.story")
+      }
+    }
+  }
+
+  ant.fail(if: "easyb.failed", message: "Execution halted as specifications failed")
+}
+
 
 target("validate-behaviors": "runs and validates the easyb behaviors") {
   depends(jar)
@@ -166,6 +218,11 @@ target("validate-behaviors": "runs and validates the easyb behaviors") {
         include(name: "**/*.story")
         include(name: "**/*Specification.groovy")
         include(name: "**/*.specification")
+
+        exclude(name: "**/*_fr_Story.groovy")
+        exclude(name: "**/*_fr.story")
+        exclude(name: "**/*_fr_Specification.groovy")
+        exclude(name: "**/*_fr.specification")
 
         exclude(name: "**/TextStoryReportingValidation.story")
         exclude(name: "**/FailureReport.story")

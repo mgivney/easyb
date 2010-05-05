@@ -3,7 +3,6 @@ package org.easyb.domain;
 import org.easyb.BehaviorStep;
 import org.easyb.StoryBinding;
 import org.easyb.plugin.EasybPlugin;
-import org.easyb.plugin.PluginFactory;
 import org.easyb.plugin.NullPlugin;
 import org.easyb.util.BehaviorStepType;
 import org.easyb.util.NonExecutableStoryKeywords;

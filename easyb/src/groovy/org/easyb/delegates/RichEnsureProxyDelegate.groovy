@@ -1,7 +1,5 @@
 package org.easyb.delegates
 
-import org.easyb.delegates.RichlyEnsurable
-
 /**
  * this class's job is to determine which 
  * method to invoke in the FlexDelegate as invokeMethod

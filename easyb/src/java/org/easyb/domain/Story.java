@@ -36,6 +36,10 @@ public class Story extends BehaviorBase {
 
             EasybPlugin activePlugin = new PluginFactory().pluginForStory(story);
 
+            // need to find the locale before instantiating the binding since the binding's
+            // method names will depend on the whatever locale we might be using
+            story = new LocalePreProcessor().process( story );
+
             StoryBinding binding = StoryBinding.getBinding(listener, activePlugin);
             GroovyShell g = new GroovyShell(getClassLoader(), binding);
             bindShellVariables(g);

@@ -1,5 +1,8 @@
 package org.easyb.util;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public enum BehaviorStepType {
 
     GENESIS("genesis"),
@@ -20,10 +23,12 @@ public enum BehaviorStepType {
     NARRATIVE_FEATURE("feature"),
     NARRATIVE_BENEFIT("benefit");
 
+    private ResourceBundle strings = ResourceBundle.getBundle("org.easyb.i18n.BehaviorStepType", Locale.getDefault());
+
     private final String type;
 
     BehaviorStepType(String type) {
-        this.type = type;
+        this.type = strings.getString( type );
     }
 
     public String type() {

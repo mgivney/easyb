@@ -29,12 +29,18 @@ public class Specification extends BehaviorBase {
         listener.startBehavior(this);
         listener.startStep(currentStep);
 
-        setBinding(SpecificationBinding.getBinding(listener));
+        // need to discover locale before setting the binding because the bindings
+        // method names depend on the locale we're using
+        String specification = new LocalePreProcessor().process( getFile() );
+
+        setBinding(SpecificationBinding.getBinding(listener) );
         GroovyShell g = new GroovyShell(getClassLoader(), getBinding());
         bindShellVariables(g);
 
-        listener.startStep(new BehaviorStep(BehaviorStepType.EXECUTE, getPhrase()));
-        g.evaluate(getFile());
+        listener.startStep( new BehaviorStep (BehaviorStepType.EXECUTE, getPhrase()) );
+        
+        // match this to what goes on in Story.java
+        g.evaluate (specification, getFile().getAbsolutePath());
 
         listener.stopStep(); // EXEC
         listener.stopStep(); // SPECIFICATION
