@@ -25,6 +25,9 @@ class StoryKeywords extends BehaviorKeywords {
   def scenariosRun = false
   def executeStory = true
 
+  def activePlugins
+  def binding
+
 
   StoryKeywords(ExecutionListener listener) {
     super(listener)
@@ -99,16 +102,24 @@ class StoryKeywords extends BehaviorKeywords {
   }
 
 
-  def replaySteps(executeStory) {
+  def replaySteps(activePlugins, executeStory, binding) {
     // this allows the user to run the scenarios before the end of the script if they wish
     if (scenariosRun)
       return
 
     this.executeStory = executeStory
+    this.activePlugins = activePlugins
+    this.binding = binding
 
     scenariosRun = true
 
     println "running"
+
+    // let the plugins know we are starting
+    activePlugins.each { plugin ->
+      plugin.setClassLoader(getClass().getClassLoader())
+      plugin.beforeStory(binding)
+    }
 
     if (beforeScenarios)
       processScenario(beforeScenarios, false)
@@ -120,9 +131,10 @@ class StoryKeywords extends BehaviorKeywords {
         }
       }
     } finally {
-
       if (afterScenarios)
         processScenario(afterScenarios, false)
+
+      activePlugins.each { plugin -> plugin.afterStory(binding) }
     }
   }
 
@@ -145,44 +157,71 @@ class StoryKeywords extends BehaviorKeywords {
   private def processChildStep(BehaviorStep childStep) {
     listener.startStep(childStep)
 
-    if (childStep.closure == pendingClosure)
-      listener.gotResult(new Result(Result.PENDING))
-    else {
-      try {
-        println "processing ${childStep.name}"
-        if (executeStory) {
-          if (childStep.stepType == BehaviorStepType.THEN) {
-            use(BehaviorCategory) {
-              childStep.closure()
-            }
-          } else {
-            childStep.closure()
-          }
-        }
+    // figure out what to actually do
+    def action
 
+    if (childStep.closure == pendingClosure)
+      action = { listener.gotResult(new Result(Result.PENDING)) }
+    else if (!executeStory)
+      action = {}
+    else if (childStep.stepType == BehaviorStepType.THEN)
+      action = {
+        use(BehaviorCategory) {
+          childStep.closure()
+        }
         listener.gotResult new Result(Result.SUCCEEDED)
-      } catch (Throwable t) {
-        listener.gotResult new Result(t)
-      } finally {
-        listener.stopStep()
       }
+    else // other child steps
+      action = {
+        childStep.closure()
+        listener.gotResult new Result(Result.SUCCEEDED)
+      }
+
+    // now the plugin's methods are diffuse, so we use the action closure to keep it tidy
+    try {
+      switch (childStep.stepType) {
+        case BehaviorStepType.THEN:
+          activePlugins.each { plugin -> plugin.beforeThen(binding) }
+          action()
+          activePlugins.each { plugin -> plugin.afterThen(binding) }
+          break;
+        case BehaviorStepType.WHEN:
+          activePlugins.each { plugin -> plugin.beforeWhen(binding) }
+          action()
+          activePlugins.each { plugin -> plugin.afterWhen(binding) }
+          break;
+        case BehaviorStepType.GIVEN:
+          activePlugins.each { plugin -> plugin.beforeGiven(binding) }
+          action()
+          activePlugins.each { plugin -> plugin.afterGiven(binding) }
+          break;
+      }
+
+
+    } catch (Throwable t) {
+      listener.gotResult new Result(t)
+    } finally {
+      listener.stopStep()
     }
   }
 
-  private def processScenario(BehaviorStep step, run_after_before_each) {
+  private def processScenario(BehaviorStep step, isRealScenario) {
     println "running scenario ${step.name}"
 
     listener.startStep(step)
     Result result;
 
-    def processing = [BehaviorStepType.GIVEN, BehaviorStepType.WHEN, BehaviorStepType.THEN,]
+    def processing = [BehaviorStepType.GIVEN, BehaviorStepType.WHEN, BehaviorStepType.THEN]
 
     try {
-      println "is before scn? ${beforeScenarios == null}"
-      if (run_after_before_each && beforeEach)
+      if (isRealScenario)
+        activePlugins.each { plugin -> plugin.beforeScenario(binding) }
+
+      if (isRealScenario && beforeEach)
         processScenario(beforeEach, false)
 
       step.childSteps.each { childStep ->
+        println "childStep ${childStep.stepType} ${childStep.name}"
         if (childStep.stepType == BehaviorStepType.BEHAVES_AS)
           processSharedScenarios(childStep.name)
         else if (childStep.closure && processing.contains(childStep.stepType)) {
@@ -193,10 +232,14 @@ class StoryKeywords extends BehaviorKeywords {
       if (!result)
         listener.gotResult(new Result(Result.SUCCEEDED))
 
-      if (run_after_before_each && afterEach)
+      if (isRealScenario && afterEach)
         processScenario(afterEach, false)
+
     } finally {
       listener.stopStep()
+
+      if (isRealScenario)
+        activePlugins.each { plugin -> plugin.afterScenario(binding) }
     }
   }
 

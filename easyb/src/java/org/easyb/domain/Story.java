@@ -38,21 +38,17 @@ public class Story extends BehaviorBase {
       listener.startBehavior(this);
       listener.startStep(currentStep);
 
-      EasybPlugin activePlugin = new PluginFactory().pluginForStory(story);
-
-      StoryBinding binding = StoryBinding.getBinding(listener, activePlugin);
+      StoryBinding binding = StoryBinding.getBinding(listener);
       GroovyShell g = new GroovyShell(getClassLoader(), binding);
       bindShellVariables(g);
 
       setBinding(binding);
-      activePlugin.beforeStory(binding);
       listener.startStep(new BehaviorStep(BehaviorStepType.EXECUTE, getPhrase()));
 
       //Pass in path to original file so it can be used in debuggers
       g.evaluate(story, file.getAbsolutePath());
       binding.replaySteps(executeStory);
       listener.stopStep(); // EXEC
-      activePlugin.afterStory(binding);
 
       listener.stopStep();
       listener.stopBehavior(currentStep, this);
