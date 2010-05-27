@@ -33,6 +33,7 @@ class TestEasybPlugin extends BasePlugin {
     }
 
     def beforeScenario(Binding binding) {
+      println "before scenario"
         beforeScenarioCount++
     }
 
