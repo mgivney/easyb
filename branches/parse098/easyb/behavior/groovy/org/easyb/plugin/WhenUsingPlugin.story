@@ -4,7 +4,6 @@ using 'test'
 
 TestEasybPlugin.resetAllCounts()
 
-assert TestEasybPlugin.beforeStoryCount == 1
 
 scenario "just scenario", {
 }
@@ -34,26 +33,36 @@ scenario "just scenario and when", {
 
 //assert TestEasybPlugin.beforeScenarioCount == 3
 //assert TestEasybPlugin.afterScenarioCount == 3
-//assert TestEasybPlugin.beforeWhenCount == 1
-//assert TestEasybPlugin.afterWhenCount == 1
 
 scenario "just scenario and then", {
-    then "outcome"
+    then "outcome", {
+      TestEasybPlugin.beforeWhenCount.shouldBe 1
+      TestEasybPlugin.afterWhenCount.shouldBe 1
+      TestEasybPlugin.beforeScenarioCount.shouldBe 4
+      TestEasybPlugin.afterScenarioCount.shouldBe 3
+      TestEasybPlugin.beforeThenCount.shouldBe 1
+      TestEasybPlugin.afterThenCount.shouldBe 0
+    }
 }
-
-//assert TestEasybPlugin.beforeScenarioCount == 4
-//assert TestEasybPlugin.afterScenarioCount == 4
-//assert TestEasybPlugin.beforeThenCount == 1
-//assert TestEasybPlugin.afterThenCount == 1
 
 scenario "all together", {
     given "context"
     when "event"
     then "outcome"
 }
+assert TestEasybPlugin.beforeStoryCount == 0
+assert TestEasybPlugin.beforeScenarioCount == 0
+assert TestEasybPlugin.afterScenarioCount == 0
+assert TestEasybPlugin.beforeGivenCount == 0
+assert TestEasybPlugin.afterGivenCount == 0
+assert TestEasybPlugin.beforeWhenCount == 0
+assert TestEasybPlugin.afterWhenCount == 0
+assert TestEasybPlugin.beforeThenCount == 0
+assert TestEasybPlugin.afterThenCount == 0
 
 runScenarios()
 
+assert TestEasybPlugin.beforeStoryCount == 1
 assert TestEasybPlugin.beforeScenarioCount == 5
 assert TestEasybPlugin.afterScenarioCount == 5
 assert TestEasybPlugin.beforeGivenCount == 2

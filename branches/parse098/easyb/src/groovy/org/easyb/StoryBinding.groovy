@@ -11,10 +11,10 @@ class StoryBinding extends Binding {
   def activePlugins = []
 
   public replaySteps(boolean executeStory) {
-    story.replaySteps(executeStory)
+    story.replaySteps(activePlugins, executeStory, this)
   }
 
-  def StoryBinding(ExecutionListener listener, activePlugins) {
+  def StoryBinding(ExecutionListener listener) {
     this.story = new StoryKeywords(listener)
     this.activePlugins = activePlugins
 
@@ -51,7 +51,7 @@ class StoryBinding extends Binding {
 
     runScenarios = { ->
       println "running story"
-      story.replaySteps(activePlugins)
+      story.replaySteps(activePlugins, true, this)
     }
 
     then = {spec, closure = story.pendingClosure ->
@@ -145,7 +145,7 @@ class StoryBinding extends Binding {
    * has definitions for methods such as "when" and "given", which are used
    * in the context of stories.
    */
-  static StoryBinding getBinding(listener, activePlugin = new NullPlugin()) {
-    return new StoryBinding(listener, activePlugin)
+  static StoryBinding getBinding(listener) {
+    return new StoryBinding(listener)
   }
 }
