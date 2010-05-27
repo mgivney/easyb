@@ -145,7 +145,7 @@ class StoryKeywords extends BehaviorKeywords {
       result.description = "Unable to find shared scenario ${childStep.name}"
 
       return result
-    } else { // TODO: is this really what we want? Are we sure we don't want to merge all the phases?
+    } else {
       processScenario shared, false
     }
 
@@ -268,13 +268,6 @@ class StoryKeywords extends BehaviorKeywords {
 
   def given(givenDescription, closure) {
     addPlugableStep(BehaviorStepType.GIVEN, givenDescription, closure)
-
-//    try {
-//      closure ()
-//    } catch (Throwable t) {
-//      listener.gotResult (new Result (t))
-//    }
-//    stepStack.stopStep (listener)
   }
 
   def when(whenDescription, closure = {}) {
@@ -283,20 +276,6 @@ class StoryKeywords extends BehaviorKeywords {
 
   def then(spec, closure) {
     addEnsuringStep(BehaviorStepType.THEN, spec, closure)
-
-//    stepStack.startStep (listener, BehaviorStepType.THEN, spec)
-//    closure.delegate = new EnsuringDelegate ()
-//    try {
-//      use (BehaviorCategory) {
-//        closure ()
-//      }
-//      if (!closure.is (pendingClosure)) {
-//        listener.gotResult (new Result (Result.SUCCEEDED))
-//      }
-//    } catch (Throwable t) {
-//      listener.gotResult (new Result (t))
-//    }
-//    stepStack.stopStep (listener)
   }
 
   def and(description, closure) {
@@ -309,11 +288,6 @@ class StoryKeywords extends BehaviorKeywords {
     else if (currentStep.lastChildsBehaviorStepType == BehaviorStepType.THEN) {
       then(description, closure)
     }
-
-//    else {
-//      stepStack.startStep (listener, BehaviorStepType.AND, "")
-//      stepStack.stopStep (listener)
-//    }
   }
 
   def but(description, closure) {

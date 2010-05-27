@@ -3,19 +3,20 @@ package org.easyb
 import org.easyb.listener.ExecutionListener
 
 class BehaviorStepStack {
-  ExecutionListener listener
+  def ExecutionListener listener
+  def BehaviorStep currentStep
 
   public BehaviorStepStack(ExecutionListener listener) {
     this.listener = listener
   }
 
   def startStep( behaviorType, scenarioDescription) {
-    BehaviorStep step = new BehaviorStep (behaviorType, scenarioDescription, null)
-    listener.startStep(step)
+    currentStep = new BehaviorStep (behaviorType, scenarioDescription, null)
+    listener.startStep(currentStep)
   }
 
   def lastStep() {
-    throw new RuntimeException("don't create me")
+    return currentStep
   }
 
   def stopStep() {
