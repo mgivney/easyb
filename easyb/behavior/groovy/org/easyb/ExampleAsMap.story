@@ -7,8 +7,9 @@ numberArray = [12, 8, 20, 199]
 
 examples "Number examples with #text and #number", [text:["12", "8", "20", "199"], number:numberArray]
 
-before "Before we start running the examples" {
+before "Before we start running the examples", {
   given "an initial value for counters", {
+    println "initial"
     whenCount = 0
     thenCount = 0
     numberTotal = 0
@@ -29,8 +30,9 @@ scenario "Text #text should equal #number", {
 
 after "should be true after running example data", {
   then "we should have set totals", {
+    println "thenCount is ${thenCount}"
     whenCount.shouldBe 3
-    thenCount.shouldBe 3
+    thenCount.shouldBe 2
     num = 0
     numberArray.each { num += it }
     numberTotal.shouldBe num

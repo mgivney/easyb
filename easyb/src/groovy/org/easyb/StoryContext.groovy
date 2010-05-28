@@ -16,12 +16,12 @@ public class StoryContext {
   /**
    * all of the scenarios in this context. These get evaluated when the context gets evaluated
    */
-  ArrayList<BehaviorStep> scenarioSteps = new ArrayList<BehaviorStep>()
+  ArrayList<BehaviorStep> steps = new ArrayList<BehaviorStep>()
 
   /*
    * Allows us to find them by name for shared scenarios
    */
-  HashMap<String, BehaviorStep> scenarios = new HashMap<String, BehaviorStep>()
+  HashMap<String, BehaviorStep> sharedScenarios = new HashMap<String, BehaviorStep>()
 
   /*
    Child contexts - this should ideally go only one level deep
@@ -77,9 +77,9 @@ public class StoryContext {
   }
 
   public void addStep(BehaviorStep step) {
-    scenarioSteps.add(step)
+    steps.add(step)
 
     if ( step.stepType == BehaviorStepType.SHARED_BEHAVIOR )
-      scenarios[step.name] = step
+      sharedScenarios[step.name] = step
   }
 }

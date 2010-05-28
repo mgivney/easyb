@@ -14,19 +14,19 @@ class StoryBinding extends Binding {
     this.story = new StoryKeywords(listener)
 
 
-    examples = { description = "", exampleData = null, closure = null ->
+    examples = { description = "", exampleData = null ->
       if ( exampleData != null ) {
-        story.examples( description, exampleData, closure )
+        story.examples( description, exampleData, null )
       }
     }
 
-    before_examples = {description = "", closure = {} ->
-      story.before_examples(description, closure)
-    }
-
-    after_examples = {description = "", closure = {} ->
-      story.after_examples(description, closure)
-    }
+//    before_examples = {description = "", closure = {} ->
+//      story.before_examples(description, closure)
+//    }
+//
+//    after_examples = {description = "", closure = {} ->
+//      story.after_examples(description, closure)
+//    }
 
     using = {pluginName ->
       plugin = new PluginLocator().findPluginWithName(pluginName)
