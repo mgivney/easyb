@@ -27,6 +27,28 @@ public class BehaviorStep implements Serializable {
     this(inStepType, inStepName, null)
   }
 
+  def cloneStep(BehaviorStep into) {
+    into.description = description
+    into.closure = closure
+
+    cloneChildren(into)
+  }
+
+  def cloneChildren(BehaviorStep into) {
+    childSteps.each { childStep ->
+      BehaviorStep step = new BehaviorStep(childStep.stepType, childStep.name, childStep.closure)
+      step.setParentStep into
+      into.childSteps.add(step)
+      childStep.fullClone(step)
+    }
+  }
+
+  protected fullClone(BehaviorStep into) {
+    into.description = description
+    
+    cloneChildren(into)
+  }
+
   def replay() {
     if ( closure != null ) {
       executionStartTime = System.currentTimeMillis()
@@ -103,20 +125,22 @@ public class BehaviorStep implements Serializable {
 
 
   long getBehaviorCountRecursively() {
-    return ((getSpecificationCountRecursively() + getScenarioCountRecursively()) -
-            getIgnoredScenarioCountRecursively())
+    return (getBehaviorCountListRecursively(BehaviorStepType.grossCountableTypes, Result.SUCCEEDED) +
+        getBehaviorCountListRecursively(BehaviorStepType.grossCountableTypes, Result.FAILED) )
   }
 
+
+
   long getPendingBehaviorCountRecursively() {
-    return getPendingSpecificationCountRecursively() + getPendingScenarioCountRecursively()
+    return getBehaviorCountListRecursively(BehaviorStepType.grossCountableTypes, Result.PENDING)
   }
 
   long getFailedBehaviorCountRecursively() {
-    return getFailedSpecificationCountRecursively() + getFailedScenarioCountRecursively()
+    return getBehaviorCountListRecursively(BehaviorStepType.grossCountableTypes, Result.FAILED)
   }
 
   long getSuccessBehaviorCountRecursively() {
-    return getSuccessSpecificationCountRecursively() + getSuccessScenarioCountRecursively()
+    return getBehaviorCountListRecursively(BehaviorStepType.grossCountableTypes, Result.SUCCEEDED)
   }
 
   long getStoryExecutionTimeRecursively() {
@@ -140,6 +164,24 @@ public class BehaviorStep implements Serializable {
     return executionTime
   }
 
+
+  long getBehaviorCountListRecursively(types, resultStatus) {
+    long behaviorCount = 0
+
+    if (resultStatus == null) {
+      if (types.contains(stepType)) {
+        behaviorCount++
+      }
+    } else if ((types.contains(stepType)) && (resultStatus == result?.status)) {
+      behaviorCount++
+    }
+
+    childSteps.each { childStep ->
+      behaviorCount += childStep.getBehaviorCountListRecursively(types, resultStatus)
+    }
+
+    return behaviorCount
+  }
 
   long getBehaviorCountRecursively(type, resultStatus) {
     long behaviorCount = 0

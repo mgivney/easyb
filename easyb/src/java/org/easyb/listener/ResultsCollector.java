@@ -112,6 +112,22 @@ public class ResultsCollector implements ExecutionListener {
   }
 
   public synchronized void stopStep() {
+    if (currentStep.getResult() == null && BehaviorStepType.grossCountableTypes.contains(currentStep.getStepType())) {
+      if (currentStep.getChildStepFailureResultCount() > 0) {
+        gotResult(new Result(Result.FAILED));
+      } else {
+        if (currentStep.getChildStepPendingResultCount() > 0) {
+          gotResult(new Result(Result.PENDING));
+        } else if (currentStep.getChildStepIgnoredResultCount() > 0) {
+          gotResult(new Result(Result.IGNORED));
+        } else if (currentStep.getChildStepInReviewResultCount() > 0) {
+          gotResult(new Result(Result.IN_REVIEW));
+        } else {
+          gotResult(new Result(Result.SUCCEEDED));
+        }
+      }
+    }
+
     currentStep.stopExecutionTimer();
     previousStep = currentStep;
     currentStep = currentStep.getParentStep();

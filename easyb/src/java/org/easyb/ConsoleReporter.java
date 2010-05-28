@@ -7,6 +7,9 @@ import org.easyb.listener.ResultsCollector;
 import org.easyb.result.Result;
 import org.easyb.util.BehaviorStepType;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * this class prints data to the console related to running
  * easyb stories and specifications. This is a user facing class and
@@ -137,19 +140,19 @@ public class ConsoleReporter extends ResultsCollector {
                          ", Pending: " + currentStep.getPendingSpecificationCountRecursively() +
                          ", Time elapsed: " + ( endTime - startTime ) / 1000f + " sec");
     }
-    if (( currentStep.getFailedSpecificationCountRecursively() > 0 ) ||
-        ( currentStep.getFailedScenarioCountRecursively() > 0 )) {
+    if ( currentStep.getBehaviorCountListRecursively(BehaviorStepType.grossCountableTypes, Result.FAILED) > 0 ) {
       handleFailurePrinting(currentStep);
     }
   }
 
+  private static final List<BehaviorStepType> recurseErrorStepTypes = Arrays.asList(BehaviorStepType.SCENARIO,
+               BehaviorStepType.GENESIS, BehaviorStepType.STORY, BehaviorStepType.SPECIFICATION, BehaviorStepType.EXECUTE,
+               BehaviorStepType.AFTER, BehaviorStepType.AFTER_EACH, BehaviorStepType.BEFORE, BehaviorStepType.BEFORE_EACH
+  );
+
   private void handleFailurePrinting(final BehaviorStep currentStep) {
     for (BehaviorStep step : currentStep.getChildSteps()) {
-      if (step.getStepType().equals(BehaviorStepType.SCENARIO) ||
-          step.getStepType().equals(BehaviorStepType.GENESIS) ||
-          step.getStepType().equals(BehaviorStepType.STORY) ||
-          step.getStepType().equals(BehaviorStepType.SPECIFICATION) ||
-          step.getStepType().equals(BehaviorStepType.EXECUTE)) {
+      if (recurseErrorStepTypes.contains(step.getStepType())) {
         handleFailurePrinting(step);
       } else {
         printFailureMessage(step);
@@ -158,11 +161,11 @@ public class ConsoleReporter extends ResultsCollector {
   }
 
   private void printFailureMessage(final BehaviorStep istep) {
-    if (istep.getResult() != null && istep.getResult().failed()
-        && istep.getResult().cause() != null) {
-      System.out.println("\tscenario \"" + istep.getParentStep().getName() + "\"");
-      System.out.println("\tstep \"" + istep.getName() + "\" -- " +
-                         istep.getResult().cause().getMessage());
+
+    if (istep.getResult() != null && istep.getResult().failed() ) {
+      System.out.println("\t" + istep.getParentStep().getStepType().type() + " \"" + istep.getParentStep().getName() + "\"");
+      System.out.println("\tstep " + istep.getStepType().toString() +  " \"" + istep.getName() + "\" -- " +
+                    (istep.getResult().cause() != null ? istep.getResult().cause().getMessage() : istep.getResult().description) );
     }
   }
 }
