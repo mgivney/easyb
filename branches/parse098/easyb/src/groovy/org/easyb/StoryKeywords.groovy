@@ -7,30 +7,47 @@ import org.easyb.delegates.EnsuringDelegate
 import org.easyb.delegates.PlugableDelegate
 import org.easyb.util.BehaviorStepType
 
+/**
+ * story keywords just collects and parses the data into steps inside contexts
+ */
 class StoryKeywords extends BehaviorKeywords {
-  protected ArrayList<BehaviorStep> scenarioSteps = new ArrayList<BehaviorStep>()
-  protected HashMap<String, BehaviorStep> scenarios = new HashMap<String, BehaviorStep>()
-  private BehaviorStep currentStep
-
-  BehaviorStep beforeScenarios
-  BehaviorStep afterScenarios
-
-  def ignoreAll = false
-  def ignoreList = []
-  def ignoreRegEx
-
-  BehaviorStep beforeEach
-  BehaviorStep afterEach
-
   def scenariosRun = false
-  def executeStory = true
 
-  def activePlugins
-  def binding
-
+  StoryContext topContext
+  StoryContext currentContext
+  BehaviorStep currentStep
 
   StoryKeywords(ExecutionListener listener) {
     super(listener)
+
+    topContext = new StoryContext()
+    currentContext = topContext
+  }
+
+  def examples(description, data, closure) {
+    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure)
+
+    // if a closure has been passed, we need to evaluate the closure within the context of a new story context
+    if (closure != null) {
+      StoryContext ctx = new StoryContext()
+
+      StoryContext oldContext = currentContext
+      oldContext.childContexts.add(ctx)
+      currentContext = ctx
+
+      currentContext.exampleData = data
+      currentContext.exampleStep = step
+
+      try {
+        // all new scenarios, etc go into this closure
+        closure()
+      } finally {
+        currentContext = oldContext
+      }
+    } else {
+      currentContext.exampleData = data
+      currentContext.exampleStep = step
+    }
   }
 
   /**
@@ -53,19 +70,19 @@ class StoryKeywords extends BehaviorKeywords {
   }
 
   def before(description, closure) {
-    beforeScenarios = parseScenario(closure, description, BehaviorStepType.BEFORE)
+    currentContext.beforeScenarios = parseScenario(closure, description, BehaviorStepType.BEFORE)
   }
 
   def after(description, closure) {
-    afterScenarios = parseScenario(closure, description, BehaviorStepType.AFTER)
+    currentContext.afterScenarios = parseScenario(closure, description, BehaviorStepType.AFTER)
   }
 
   def beforeEach(description, closure) {
-    beforeEach = parseScenario(closure, description, BehaviorStepType.BEFORE_EACH)
+    currentContext.beforeEach = parseScenario(closure, description, BehaviorStepType.BEFORE_EACH)
   }
 
   def afterEach(description, closure) {
-    afterEach = parseScenario(closure, description, BehaviorStepType.AFTER_EACH)
+    currentContext.afterEach = parseScenario(closure, description, BehaviorStepType.AFTER_EACH)
   }
 
   def scenario(scenarioDescription, scenarioClosure) {
@@ -79,21 +96,14 @@ class StoryKeywords extends BehaviorKeywords {
 
     currentStep = scenarioStep
 
-
-    if (ignoreAll || this.ignoreList.contains(scenarioDescription)
-        || this.ignoreRegEx?.matcher(scenarioDescription)?.matches()) {
-      println "skipping"
-      listener.startStep currentStep
-      listener.gotResult new Result(Result.IGNORED)
-      listener.stopStep()
+    if (currentContext.ignoreAll || currentContext.ignoreList.contains(scenarioDescription)
+        || currentContext.ignoreRegEx?.matcher(scenarioDescription)?.matches()) {
+      scenarioStep.ignore = true
     } else if (scenarioClosure == pendingClosure) {
-      listener.startStep currentStep
-      pendingClosure()
-      listener.stopStep()
+      scenarioStep.pending = true
     } else {
-      scenarioSteps.add(currentStep)
-      scenarios[scenarioDescription] = currentStep
-      scenarioClosure()
+      currentContext.addStep(scenarioStep)
+      scenarioClosure() // now parse the scenario
     }
 
     currentStep = null
@@ -101,166 +111,47 @@ class StoryKeywords extends BehaviorKeywords {
     return scenarioStep
   }
 
+  def addPlugin(plugin) {
+    currentContext.addPlugin plugin
+  }
 
-  def replaySteps(activePlugins, executeStory, binding) {
+  def replaySteps(executeStory, binding) {
     // this allows the user to run the scenarios before the end of the script if they wish
     if (scenariosRun)
       return
 
-    this.executeStory = executeStory
-    this.activePlugins = activePlugins
-    this.binding = binding
+    StoryContext.binding = binding
 
     scenariosRun = true
 
     println "running"
 
-    // let the plugins know we are starting
-    activePlugins.each { plugin ->
-      plugin.setClassLoader(getClass().getClassLoader())
-      plugin.beforeStory(binding)
-    }
-
-    if (beforeScenarios)
-      processScenario(beforeScenarios, false)
-
-    try {
-      scenarioSteps.each { step ->
-        if (step.stepType == BehaviorStepType.SCENARIO) {
-          processScenario step, true
-        }
-      }
-    } finally {
-      if (afterScenarios)
-        processScenario(afterScenarios, false)
-
-      activePlugins.each { plugin -> plugin.afterStory(binding) }
-    }
+    StoryProcessing sp = new StoryProcessing()
+    sp.processStory(topContext, executeStory, listener)
   }
 
-  private def processSharedScenarios(name) {
-    BehaviorStep shared = scenarios[name]
-    if (!shared) { // can't find the shared scenario
-      def result = new Result(Result.FAILED)
-      result.description = "Unable to find shared scenario ${childStep.name}"
-
-      return result
-    } else {
-      processScenario shared, false
-    }
-
-    println "out of shared, back to original"
-
-    return null
-  }
-
-  private def processChildStep(BehaviorStep childStep) {
-    listener.startStep(childStep)
-
-    // figure out what to actually do
-    def action
-
-    if (childStep.closure == pendingClosure)
-      action = { listener.gotResult(new Result(Result.PENDING)) }
-    else if (!executeStory)
-      action = {}
-    else if (childStep.stepType == BehaviorStepType.THEN)
-      action = {
-        use(BehaviorCategory) {
-          childStep.closure()
-        }
-        listener.gotResult new Result(Result.SUCCEEDED)
-      }
-    else // other child steps
-      action = {
-        childStep.closure()
-        listener.gotResult new Result(Result.SUCCEEDED)
-      }
-
-    // now the plugin's methods are diffuse, so we use the action closure to keep it tidy
-    try {
-      switch (childStep.stepType) {
-        case BehaviorStepType.THEN:
-          activePlugins.each { plugin -> plugin.beforeThen(binding) }
-          action()
-          activePlugins.each { plugin -> plugin.afterThen(binding) }
-          break;
-        case BehaviorStepType.WHEN:
-          activePlugins.each { plugin -> plugin.beforeWhen(binding) }
-          action()
-          activePlugins.each { plugin -> plugin.afterWhen(binding) }
-          break;
-        case BehaviorStepType.GIVEN:
-          activePlugins.each { plugin -> plugin.beforeGiven(binding) }
-          action()
-          activePlugins.each { plugin -> plugin.afterGiven(binding) }
-          break;
-      }
-
-
-    } catch (Throwable t) {
-      listener.gotResult new Result(t)
-    } finally {
-      listener.stopStep()
-    }
-  }
-
-  private def processScenario(BehaviorStep step, isRealScenario) {
-    println "running scenario ${step.name}"
-
-    listener.startStep(step)
-    Result result;
-
-    def processing = [BehaviorStepType.GIVEN, BehaviorStepType.WHEN, BehaviorStepType.THEN]
-
-    try {
-      if (isRealScenario)
-        activePlugins.each { plugin -> plugin.beforeScenario(binding) }
-
-      if (isRealScenario && beforeEach)
-        processScenario(beforeEach, false)
-
-      step.childSteps.each { childStep ->
-        println "childStep ${childStep.stepType} ${childStep.name}"
-        if (childStep.stepType == BehaviorStepType.BEHAVES_AS)
-          processSharedScenarios(childStep.name)
-        else if (childStep.closure && processing.contains(childStep.stepType)) {
-          processChildStep(childStep)
-        }
-      }
-
-      if (!result)
-        listener.gotResult(new Result(Result.SUCCEEDED))
-
-      if (isRealScenario && afterEach)
-        processScenario(afterEach, false)
-
-    } finally {
-      listener.stopStep()
-
-      if (isRealScenario)
-        activePlugins.each { plugin -> plugin.afterScenario(binding) }
-    }
-  }
 
   private def addStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
     BehaviorStep step = new BehaviorStep(inStepType, inStepName, closure)
 
+    if (closure == pendingClosure)
+      step.pending = true
+
     if (!currentStep)
-      processChildStep(step)
+      currentContext.addStep step
     else
       currentStep.addChildStep step
   }
 
   private def addPlugableStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
-    if (closure != null)
+    if (closure != null && closure != pendingClosure)
       closure.delegate = new PlugableDelegate()
 
     addStep(inStepType, inStepName, closure)
   }
 
   private def addEnsuringStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
-    if (closure != null)
+    if (closure != null && closure != pendingClosure)
       closure.delegate = new EnsuringDelegate()
 
     addStep(inStepType, inStepName, closure)
@@ -295,22 +186,22 @@ class StoryKeywords extends BehaviorKeywords {
   }
 
   def ignoreOn() {
-    this.ignoreAll = true
+    currentContext.ignoreAll = true
   }
 
   def ignoreOff() {
-    this.ignoreAll = false
+    currentContext.ignoreAll = false
   }
 
   def ignore(scenarios) {
-    if (!this.ignoreAll) {
-      this.ignoreList = scenarios
+    if (!currentContext.ignoreAll) {
+      currentContext.ignoreList = scenarios
     }
   }
 
   def ignore(Pattern scenarioPattern) {
-    if (!this.ignoreAll) {
-      this.ignoreRegEx = scenarioPattern
+    if (!currentContext.ignoreAll) {
+      currentContext.ignoreRegEx = scenarioPattern
     }
   }
 
