@@ -12,6 +12,8 @@ public class BehaviorStep implements Serializable {
   long executionStartTime = 0
   long executionFinishTime = 0
   Closure closure
+  boolean ignore
+  boolean pending
 
   ArrayList<BehaviorStep> childSteps = new ArrayList<BehaviorStep>()
 
@@ -338,6 +340,7 @@ public class BehaviorStep implements Serializable {
       case BehaviorStepType.NARRATIVE_BENEFIT:
       case BehaviorStepType.BEFORE:
       case BehaviorStepType.AFTER:
+      case BehaviorStepType.EXAMPLES:
       case BehaviorStepType.BEFORE_EACH:
       case BehaviorStepType.AFTER_EACH:
       case BehaviorStepType.IT:

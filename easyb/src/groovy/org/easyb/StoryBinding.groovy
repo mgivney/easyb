@@ -1,29 +1,37 @@
 package org.easyb
 
-import org.easyb.StoryKeywords
 import org.easyb.listener.ExecutionListener
-import org.easyb.plugin.EasybPlugin
-import org.easyb.plugin.NullPlugin
 import org.easyb.plugin.PluginLocator
 
 class StoryBinding extends Binding {
   StoryKeywords story
-  def activePlugins = []
 
   public replaySteps(boolean executeStory) {
-    story.replaySteps(activePlugins, executeStory, this)
+    story.replaySteps(executeStory, this)
   }
 
   def StoryBinding(ExecutionListener listener) {
     this.story = new StoryKeywords(listener)
-    this.activePlugins = activePlugins
+
+
+    examples = { description = "", exampleData = null, closure = null ->
+      if ( exampleData != null ) {
+        story.examples( description, exampleData, closure )
+      }
+    }
+
+    before_examples = {description = "", closure = {} ->
+      story.before_examples(description, closure)
+    }
+
+    after_examples = {description = "", closure = {} ->
+      story.after_examples(description, closure)
+    }
 
     using = {pluginName ->
       plugin = new PluginLocator().findPluginWithName(pluginName)
 
-      if ( !activePlugins.contains(plugin) ) {
-        activePlugins << plugin
-      }
+      story.addPlugin( plugin )
     }
 
     before = {description = "", closure = {} ->
@@ -51,7 +59,7 @@ class StoryBinding extends Binding {
 
     runScenarios = { ->
       println "running story"
-      story.replaySteps(activePlugins, true, this)
+      story.replaySteps( true, this)
     }
 
     then = {spec, closure = story.pendingClosure ->
