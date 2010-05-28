@@ -1,10 +1,8 @@
 package org.easyb
 
-import java.util.regex.Pattern
 import org.easyb.listener.ExecutionListener
 import org.easyb.result.Result
-import org.easyb.delegates.EnsuringDelegate
-import org.easyb.delegates.PlugableDelegate
+
 import org.easyb.util.BehaviorStepType
 
 public class StoryProcessing {
@@ -20,10 +18,51 @@ public class StoryProcessing {
     runContext(currentContext)
   }
 
+  private def processSteps(StoryContext context) {
+    context.steps.each { BehaviorStep step ->
+      if (step.stepType == BehaviorStepType.SCENARIO) {
+        if ( step.ignore ) {
+          listener.startStep step
+          listener.gotResult new Result(Result.IGNORED)
+          listener.stopStep()
+        } else if ( step.pending ) {
+          listener.startStep step
+          step.closure()
+          listener.stopStep()
+        } else {
+          processScenario step, true
+        }
+      } else {
+        processChildStep step
+      }
+    }
+  }
+
+  private def processStepsUsingMap(StoryContext context) {
+    // collect field names
+    int max = 0
+    def fields = []
+
+    context.exampleData.each { key, value ->
+      fields.add(key)
+      
+      if ( !max )
+        max = value.size()
+    }
+
+    for( int idx = 0; idx < max; idx ++ ) {
+      fields.each { field ->
+        context.binding.setProperty field, context.exampleData[field][idx]
+      }
+
+      processSteps(context)
+    }
+  }
+
   /*
     runs all of the scenarios, befores and afters in this context
    */
-  def runContext(StoryContext context) {
+  private def runContext(StoryContext context) {
     // let the plugins know we are starting
     context.notifyPlugins { plugin, binding ->
       plugin.setClassLoader(getClass().getClassLoader())
@@ -33,25 +72,15 @@ public class StoryProcessing {
     if (context.beforeScenarios)
       processScenario(context.beforeScenarios, false)
 
+
     try {
-      context.scenarioSteps.each { BehaviorStep step ->
-        if (step.stepType == BehaviorStepType.SCENARIO) {
-          if ( step.ignore ) {
-            listener.startStep step
-            listener.gotResult new Result(Result.IGNORED)
-            listener.stopStep()
-          } else if ( step.pending ) {
-            listener.startStep step
-            step.closure()
-            listener.stopStep()
-          } else {
-            processScenario step, true
-          }
-        } else {
-          processChildStep step
+      if ( !context.exampleData )
+        processSteps(context)
+      else if ( context.exampleData instanceof Map ) {
+        if ( context.exampleData.size() ) {
+          processStepsUsingMap(context)
         }
       }
-
     } finally {
       if (context.afterScenarios)
         processScenario(context.afterScenarios, false)
@@ -62,7 +91,7 @@ public class StoryProcessing {
 
 
   private def processSharedScenarios(name) {
-    BehaviorStep shared = currentContext.scenarios[name]
+    BehaviorStep shared = currentContext.sharedScenarios[name]
 
     if (!shared) { // can't find the shared scenario
       def result = new Result(Result.FAILED)
@@ -85,20 +114,23 @@ public class StoryProcessing {
     def action
 
     if (childStep.pending)
-      action = childStep.closure
+      action = { childStep.replay() }
     else if (!executeStory)
       action = {}
     else if (childStep.stepType == BehaviorStepType.THEN)
       action = {
         use(BehaviorCategory) {
-          childStep.closure()
+//          println "runnig then closure"
+          childStep.replay()
         }
-        listener.gotResult new Result(Result.SUCCEEDED)
+        childStep.result = new Result(Result.SUCCEEDED)
+        listener.gotResult childStep.result
       }
     else // other child steps
       action = {
-        childStep.closure()
-        listener.gotResult new Result(Result.SUCCEEDED)
+        childStep.replay()
+        childStep.result = new Result(Result.SUCCEEDED)
+        listener.gotResult childStep.result
       }
 
     // now the plugin's methods are diffuse, so we use the action closure to keep it tidy
@@ -123,7 +155,8 @@ public class StoryProcessing {
 
 
     } catch (Throwable t) { // who knows what could happen, whatever does, its a failure
-      listener.gotResult new Result(t)
+      childStep.result = new Result(t)
+      listener.gotResult childStep.result
     } finally {
       listener.stopStep()
     }
@@ -145,7 +178,7 @@ public class StoryProcessing {
         processScenario(currentContext.beforeEach, false)
 
       step.childSteps.each { childStep ->
-        println "childStep ${childStep.stepType} ${childStep.name}"
+//        println "childStep ${childStep.stepType} ${childStep.name}"
         if (childStep.stepType == BehaviorStepType.BEHAVES_AS)
           processSharedScenarios(childStep.name)
         else if (childStep.closure && processing.contains(childStep.stepType)) {
@@ -154,7 +187,12 @@ public class StoryProcessing {
       }
 
       if (step.childStepFailureResultCount == 0)
-        listener.gotResult(new Result(Result.SUCCEEDED))
+        step.result = new Result(Result.SUCCEEDED)
+      else {
+        step.result = new Result(Result.FAILED)
+      }
+
+      listener.gotResult step.result
 
       if (isRealScenario && currentContext.afterEach)
         processScenario(currentContext.afterEach, false)

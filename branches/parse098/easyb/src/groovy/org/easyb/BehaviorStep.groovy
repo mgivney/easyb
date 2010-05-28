@@ -11,7 +11,7 @@ public class BehaviorStep implements Serializable {
   String description
   long executionStartTime = 0
   long executionFinishTime = 0
-  Closure closure
+  public Closure closure
   boolean ignore
   boolean pending
 
@@ -155,6 +155,7 @@ public class BehaviorStep implements Serializable {
     for (childStep in childSteps) {
       behaviorCount += childStep.getBehaviorCountRecursively(type, resultStatus)
     }
+    
     return behaviorCount
   }
 
