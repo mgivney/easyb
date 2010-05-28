@@ -90,21 +90,24 @@ public class StoryProcessing {
   }
 
 
-  private def processSharedScenarios(name) {
-    BehaviorStep shared = currentContext.sharedScenarios[name]
+  private def processSharedScenarios(sharedStep) {
+    BehaviorStep shared = currentContext.sharedScenarios[sharedStep.name]
 
     if (!shared) { // can't find the shared scenario
-      def result = new Result(Result.FAILED)
-      result.description = "Unable to find shared scenario ${name}"
+      listener.startStep(sharedStep)
+      
+      sharedStep.result = new Result(Result.FAILED)
+      sharedStep.result.description = "Unable to find shared scenario ${sharedStep.name}"
 
-      return result
+      listener.gotResult sharedStep.result
+
+      listener.stopStep()
     } else {
-      processScenario shared, false
+      shared.cloneStep(sharedStep)  // copy shared behaviour into this object
+      processScenario sharedStep, false
     }
 
     println "out of shared, back to original"
-
-    return null
   }
 
   private def processChildStep(BehaviorStep childStep) {
@@ -180,7 +183,7 @@ public class StoryProcessing {
       step.childSteps.each { childStep ->
 //        println "childStep ${childStep.stepType} ${childStep.name}"
         if (childStep.stepType == BehaviorStepType.BEHAVES_AS)
-          processSharedScenarios(childStep.name)
+          processSharedScenarios(childStep)
         else if (childStep.closure && processing.contains(childStep.stepType)) {
           processChildStep(childStep)
         }

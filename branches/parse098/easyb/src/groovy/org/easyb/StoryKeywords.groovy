@@ -58,6 +58,7 @@ class StoryKeywords extends BehaviorKeywords {
    * @return
    */
   def sharedBehavior(description, closure) {
+    println "parse shared behavior ${description}"
     parseScenario(closure, description, BehaviorStepType.SHARED_BEHAVIOR)
   }
 
@@ -86,12 +87,12 @@ class StoryKeywords extends BehaviorKeywords {
   }
 
   def scenario(scenarioDescription, scenarioClosure) {
-    println "scenario ${scenarioDescription}"
+    println "parsing scenario ${scenarioDescription}"
     parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType.SCENARIO)
   }
 
   def parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType type) {
-    println "runScenario"
+    println "parseScenario"
     def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure)
 
     currentStep = scenarioStep
@@ -102,7 +103,12 @@ class StoryKeywords extends BehaviorKeywords {
     } else if (scenarioClosure == pendingClosure) {
       scenarioStep.pending = true
     } else {
-      currentContext.addStep(scenarioStep)
+      if ( type == BehaviorStepType.SCENARIO )
+        currentContext.addStep(scenarioStep)
+      
+      if ( type == BehaviorStepType.SHARED_BEHAVIOR )
+        currentContext.sharedScenarios[scenarioStep.name] = scenarioStep
+
       scenarioClosure() // now parse the scenario
     }
 
@@ -197,6 +203,10 @@ class StoryKeywords extends BehaviorKeywords {
     if (!currentContext.ignoreAll) {
       currentContext.ignoreList = scenarios
     }
+  }
+
+  def setIgnoreList(list) {
+    currentContext.ignoreList = list
   }
 
   def ignore(Pattern scenarioPattern) {

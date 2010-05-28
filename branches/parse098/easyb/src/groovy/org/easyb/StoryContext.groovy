@@ -78,8 +78,5 @@ public class StoryContext {
 
   public void addStep(BehaviorStep step) {
     steps.add(step)
-
-    if ( step.stepType == BehaviorStepType.SHARED_BEHAVIOR )
-      sharedScenarios[step.name] = step
   }
 }
