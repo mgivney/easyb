@@ -14,6 +14,9 @@ public class BehaviorStep implements Serializable {
   public Closure closure
   boolean ignore
   boolean pending
+  def exampleData
+  def exampleName
+  StoryContext storyContext
 
   ArrayList<BehaviorStep> childSteps = new ArrayList<BehaviorStep>()
 

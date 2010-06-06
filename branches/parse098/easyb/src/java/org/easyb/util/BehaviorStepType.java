@@ -78,7 +78,7 @@ public enum BehaviorStepType {
 
   public static List<BehaviorStepType> grossCountableTypes = Arrays.asList(
     BehaviorStepType.SPECIFICATION, BehaviorStepType.SCENARIO, BehaviorStepType.BEFORE, BehaviorStepType.AFTER, BehaviorStepType.AFTER_EACH,
-    BehaviorStepType.BEFORE_EACH);
+    BehaviorStepType.BEFORE_EACH, BehaviorStepType.EXAMPLES);
 
   public String format(BehaviorStepType genesis) {
     String format = type;
