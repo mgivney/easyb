@@ -24,29 +24,66 @@ class StoryKeywords extends BehaviorKeywords {
     currentContext = topContext
   }
 
-  def examples(description, data, closure) {
+  /**
+   * we create a new example step and story context, associate the example data with it and
+   * then process the closure within that context. This allows examples within examples within examples as the
+   * tester requires.
+   *
+   * @param description
+   * @param data
+   * @param closure
+   */
+  private void processExamplesClosure(description, data, closure) {
     def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure)
 
-    // if a closure has been passed, we need to evaluate the closure within the context of a new story context
-    if (closure != null) {
-      StoryContext ctx = new StoryContext()
+    StoryContext ctx = new StoryContext()
 
-      StoryContext oldContext = currentContext
-      oldContext.childContexts.add(ctx)
-      currentContext = ctx
+    step.storyContext = ctx
+    ctx.parentContext = currentContext
 
-      currentContext.exampleData = data
-      currentContext.exampleStep = step
+    currentContext = ctx
 
-      try {
-        // all new scenarios, etc go into this closure
-        closure()
-      } finally {
-        currentContext = oldContext
+    ctx.exampleData = data
+    ctx.exampleStep = step
+
+    // preserve the step as all subsequent syntax appears underneath the example
+    BehaviorStep oldStep = currentStep
+    currentStep = step
+
+    try {
+      // all new scenarios, etc go into this closure
+      closure()
+    } finally {
+      currentContext = ctx.parentContext
+      currentStep = oldStep
+    }
+  }
+
+  def examples(description, data, closure) {
+    if (currentStep && currentStep.stepType != BehaviorStepType.EXAMPLES && currentStep.stepType != BehaviorStepType.SCENARIO) {
+      throw new IncorrectGrammarException("examples keyword were it should not exist.")
+    }
+
+    if (!currentStep) {
+      if (closure) {
+        // if a closure has been passed, we need to evaluate the closure within the context of a new story context
+        // i.e. a new EXAMPLE step gets created
+        processExamplesClosure(description, data, closure)
+      } else if ( currentContext.exampleData ) {
+        // this is an error if it occurs twice!
+        throw new IncorrectGrammarException("An attempt has been made to specify example data twice within the same context.")
+      } else { // example data for current context
+        // otherwise it is example data for the current context. If top level, no problem, if in example step, also no problem
+        currentContext.exampleData = data
       }
-    } else {
-      currentContext.exampleData = data
-      currentContext.exampleStep = step
+    } else if ( currentStep.stepType == BehaviorStepType.EXAMPLES ) {
+      if ( !closure ) // we already have data for this story context thanks,
+        throw new IncorrectGrammarException("examples keyword inside an examples closure must also pass a closure for context")
+      
+      processExamplesClosure(description, data, closure)
+    } else { // we are in a scenario, so lets associate the content with it
+      currentStep.exampleData = data
+      currentStep.exampleName = description
     }
   }
 
@@ -103,11 +140,11 @@ class StoryKeywords extends BehaviorKeywords {
     } else if (scenarioClosure == pendingClosure) {
       scenarioStep.pending = true
     } else {
-      if ( type == BehaviorStepType.SCENARIO )
-        currentContext.addStep(scenarioStep)
-      
-      if ( type == BehaviorStepType.SHARED_BEHAVIOR )
-        currentContext.sharedScenarios[scenarioStep.name] = scenarioStep
+      if (type == BehaviorStepType.SCENARIO)
+      currentContext.addStep(scenarioStep)
+
+      if (type == BehaviorStepType.SHARED_BEHAVIOR)
+      currentContext.sharedScenarios[scenarioStep.name] = scenarioStep
 
       scenarioClosure() // now parse the scenario
     }

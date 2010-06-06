@@ -23,11 +23,6 @@ public class StoryContext {
    */
   HashMap<String, BehaviorStep> sharedScenarios = new HashMap<String, BehaviorStep>()
 
-  /*
-   Child contexts - this should ideally go only one level deep
-   */
-  ArrayList<StoryContext> childContexts = new ArrayList<StoryContext>()
-
   StoryContext parentContext;
 
   /* before step */

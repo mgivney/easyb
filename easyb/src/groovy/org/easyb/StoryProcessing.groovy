@@ -6,87 +6,129 @@ import org.easyb.result.Result
 import org.easyb.util.BehaviorStepType
 
 public class StoryProcessing {
-  StoryContext currentContext
+  Stack<StoryContext> contextStack = new Stack<StoryContext>();
+  StoryContext currentContext = null
   boolean executeStory
   ExecutionListener listener
 
-  public def processStory(StoryContext currentContext, boolean executeStory, ExecutionListener listener){
-    this.currentContext = currentContext
+  public def processStory(StoryContext currentContext, boolean executeStory, ExecutionListener listener) {
     this.executeStory = executeStory
     this.listener = listener
 
     runContext(currentContext)
   }
 
-  private def processSteps(StoryContext context) {
+  private def processStoryContext(StoryContext context) {
     context.steps.each { BehaviorStep step ->
       if (step.stepType == BehaviorStepType.SCENARIO) {
-        if ( step.ignore ) {
+        if (step.ignore) {
           listener.startStep step
           listener.gotResult new Result(Result.IGNORED)
           listener.stopStep()
-        } else if ( step.pending ) {
+        } else if (step.pending) {
           listener.startStep step
           step.closure()
           listener.stopStep()
+        } else if ( step.exampleData ) {
+          processScenarioWithExamples step
         } else {
           processScenario step, true
         }
+      } else if ( step.stepType == BehaviorStepType.EXAMPLES ) {
+        runContext(step.storyContext)
       } else {
         processChildStep step
       }
     }
   }
 
-  private def processStepsUsingMap(StoryContext context) {
-    // collect field names
+  private def extractMapExampleData( map ) {
     int max = 0
     def fields = []
 
-    context.exampleData.each { key, value ->
+    map.each { key, value ->
       fields.add(key)
-      
-      if ( !max )
-        max = value.size()
+
+      if (!max)
+      max = value.size()
     }
 
-    for( int idx = 0; idx < max; idx ++ ) {
+    return [max, fields]
+  }
+
+
+  private void processScenariosWithExampleMap(BehaviorStep scenario) {
+    def (int max, fields) = extractMapExampleData(scenario.exampleData)
+
+    for (int idx = 0; idx < max; idx++) {
+      fields.each { field ->
+        currentContext.binding.setProperty field, scenario.exampleData[field][idx]
+      }
+
+      processScenario(scenario, true)
+    }
+  }
+
+  private void processScenarioWithExamples(BehaviorStep scenario) {
+    if ( scenario.exampleData instanceof Map ) {
+      processScenariosWithExampleMap scenario
+    } else {
+      throw new IncorrectGrammarException("Don't know how to process example data in scenario ${scenario.name}" )
+    }
+  }
+
+  private def processStepsUsingMap(StoryContext context) {
+    // collect field names
+    def (int max, fields) = extractMapExampleData(context.exampleData)
+
+    for (int idx = 0; idx < max; idx++) {
       fields.each { field ->
         context.binding.setProperty field, context.exampleData[field][idx]
       }
 
-      processSteps(context)
+      processStoryContext(context)
     }
   }
 
   /*
     runs all of the scenarios, befores and afters in this context
    */
+
   private def runContext(StoryContext context) {
-    // let the plugins know we are starting
-    context.notifyPlugins { plugin, binding ->
-      plugin.setClassLoader(getClass().getClassLoader())
-      plugin.beforeStory(binding)
-    }
-
-    if (context.beforeScenarios)
-      processScenario(context.beforeScenarios, false)
-
+    if (currentContext != null)
+      contextStack.push(currentContext)
 
     try {
-      if ( !context.exampleData )
-        processSteps(context)
-      else if ( context.exampleData instanceof Map ) {
-        if ( context.exampleData.size() ) {
-          processStepsUsingMap(context)
+      this.currentContext = context
+
+      // let the plugins know we are starting
+      context.notifyPlugins { plugin, binding ->
+        plugin.setClassLoader(getClass().getClassLoader())
+        plugin.beforeStory(binding)
+      }
+
+      if (context.beforeScenarios)
+        processScenario(context.beforeScenarios, false)
+
+      try {
+        if (!context.exampleData)
+          processStoryContext(context)
+        else if (context.exampleData instanceof Map) {
+          if (context.exampleData.size()) {
+            processStepsUsingMap(context)
+          }
         }
+      } finally {
+        if (context.afterScenarios)
+          processScenario(context.afterScenarios, false)
+
+        context.notifyPlugins { plugin, binding -> plugin.afterStory(binding) }
       }
     } finally {
-      if (context.afterScenarios)
-        processScenario(context.afterScenarios, false)
-
-      context.notifyPlugins { plugin, binding -> plugin.afterStory(binding) }
+      if (contextStack.size())
+        currentContext = contextStack.pop()
     }
+
   }
 
 
@@ -95,7 +137,7 @@ public class StoryProcessing {
 
     if (!shared) { // can't find the shared scenario
       listener.startStep(sharedStep)
-      
+
       sharedStep.result = new Result(Result.FAILED)
       sharedStep.result.description = "Unable to find shared scenario ${sharedStep.name}"
 
