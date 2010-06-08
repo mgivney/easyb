@@ -186,11 +186,10 @@ public class StoryProcessing {
 
       listener.stopStep()
     } else {
-      shared.cloneStep(sharedStep)  // copy shared behaviour into this object
-      processScenario sharedStep, false
+      processScenario shared, false
     }
 
-    println "out of shared, back to original"
+//    println "out of shared, back to original"
   }
 
   private def processChildStep(BehaviorStep childStep) {
@@ -252,7 +251,7 @@ public class StoryProcessing {
   private def processScenario(BehaviorStep step, isRealScenario) {
 
     step.decodeCurrentName StoryContext.binding, currentIteration
-    println "running scenario ${step.name}"
+//    println "running scenario ${step.name}"
 
 
     listener.startStep(step)
@@ -268,6 +267,7 @@ public class StoryProcessing {
         processScenario(currentContext.beforeEach, false)
 
       step.childSteps.each { childStep ->
+
 //        println "childStep ${childStep.stepType} ${childStep.name}"
         if (childStep.stepType == BehaviorStepType.BEHAVES_AS)
           processSharedScenarios(childStep)
