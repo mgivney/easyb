@@ -53,6 +53,7 @@ class StoryKeywords extends BehaviorKeywords {
     try {
       // all new scenarios, etc go into this closure
       closure()
+      ctx.parentContext.addStep(currentStep)
     } finally {
       currentContext = ctx.parentContext
       currentStep = oldStep
@@ -132,6 +133,7 @@ class StoryKeywords extends BehaviorKeywords {
     println "parseScenario"
     def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure, currentStep)
 
+    def oldStep = currentStep
     currentStep = scenarioStep
 
     if (currentContext.ignoreAll || currentContext.ignoreList.contains(scenarioDescription)
@@ -149,7 +151,7 @@ class StoryKeywords extends BehaviorKeywords {
       scenarioClosure() // now parse the scenario
     }
 
-    currentStep = null
+    currentStep = oldStep
 
     return scenarioStep
   }
