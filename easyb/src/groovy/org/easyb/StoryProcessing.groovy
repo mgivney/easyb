@@ -58,8 +58,8 @@ public class StoryProcessing {
   }
 
 
-  private void processScenariosWithExampleMap(BehaviorStep scenario) {
-    def (int max, fields) = extractMapExampleData(scenario.exampleData)
+  private void processScenariosWithExampleMap(BehaviorStep scenario, map) {
+    def (int max, fields) = extractMapExampleData(map)
 
     int oldIteration = currentIteration
     currentIteration = 0
@@ -67,7 +67,7 @@ public class StoryProcessing {
     try {
       for (int idx = 0; idx < max; idx++) {
         fields.each { field ->
-          StoryContext.binding.setProperty field, scenario.exampleData[field][idx]
+          StoryContext.binding.setProperty field, map[field][idx]
         }
 
         processScenario(scenario, true)
@@ -79,7 +79,9 @@ public class StoryProcessing {
 
   private void processScenarioWithExamples(BehaviorStep scenario) {
     if (scenario.exampleData instanceof Map) {
-      processScenariosWithExampleMap scenario
+      processScenariosWithExampleMap scenario, scenario.exampleData
+    } else if ( scenario.exampleData instanceof Closure ) {
+      processScenariosWithExampleMap scenario, processClosure(scenario.exampleData)
     } else {
       throw new IncorrectGrammarException("Don't know how to process example data in scenario ${scenario.name}")
     }
@@ -110,7 +112,7 @@ public class StoryProcessing {
     c.resolveStrategy = Closure.DELEGATE_FIRST
     c.delegate = expando
 
-    c.call()
+    def retVal = c.call()
 
     def map = expando.getProperties()
     map.remove('story')
@@ -120,9 +122,8 @@ public class StoryProcessing {
       def item = map.values().asList()
       if ( item[0] instanceof Map )
         map = item[0]
-    }
-
-    println "map is ${map}"
+    } else if ( map.size() == 0 && retVal instanceof Map )
+      map = retVal
 
     return map
   }
