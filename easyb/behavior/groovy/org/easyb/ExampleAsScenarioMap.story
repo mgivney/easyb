@@ -17,8 +17,8 @@ before "Before we start running the examples", {
   }
 }
 
-scenario "Text #text should equal #number", {
-  when "we parse #text", {
+scenario "Text '#text' should equal #number", {
+  when "we parse '#text' in #stepName", {
     parsedValue = Integer.parseInt(text)
     whenCount ++
   }
@@ -27,7 +27,7 @@ scenario "Text #text should equal #number", {
     thenCount ++
     numberTotal += parsedValue
   }
-  where "Number examples with #text and #number", [text:["12", "8", "20", "199"], number:numberArray]
+  where "Number examples with '#text' and #number", [text:["12", "8", "20", "199"], number:numberArray]
 }
 
 scenario "Text #text should be size #number", {

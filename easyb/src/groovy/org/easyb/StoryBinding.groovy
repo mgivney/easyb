@@ -13,17 +13,23 @@ class StoryBinding extends Binding {
   def StoryBinding(ExecutionListener listener) {
     this.story = new StoryKeywords(listener)
 
-    where = { description = "", exampleData = null ->
+    where = { description, exampleData, closure = null ->
       if ( exampleData != null ) {
-        story.examples( description, exampleData, null )
+        story.examples( description, exampleData, closure )
       }
     }
 
-    examples = { description = "", exampleData = null ->
+    examples = { description, exampleData, closure = null ->
       if ( exampleData != null ) {
-        story.examples( description, exampleData, null )
+        story.examples( description, exampleData, closure )
       }
     }
+
+//    examples = { description = "", exampleData = null, closure = null ->
+//      if ( exampleData != null ) {
+//        story.examples( description, exampleData, closure )
+//      }
+//    }
 
 //    before_examples = {description = "", closure = {} ->
 //      story.before_examples(description, closure)

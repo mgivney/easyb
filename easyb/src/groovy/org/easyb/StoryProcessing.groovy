@@ -10,6 +10,7 @@ public class StoryProcessing {
   StoryContext currentContext = null
   boolean executeStory
   ExecutionListener listener
+  int currentIteration
 
   public def processStory(StoryContext currentContext, boolean executeStory, ExecutionListener listener) {
     this.executeStory = executeStory
@@ -29,12 +30,12 @@ public class StoryProcessing {
           listener.startStep step
           step.closure()
           listener.stopStep()
-        } else if ( step.exampleData ) {
+        } else if (step.exampleData) {
           processScenarioWithExamples step
         } else {
           processScenario step, true
         }
-      } else if ( step.stepType == BehaviorStepType.EXAMPLES ) {
+      } else if (step.stepType == BehaviorStepType.EXAMPLES) {
         runContext(step.storyContext)
       } else {
         processChildStep step
@@ -42,7 +43,7 @@ public class StoryProcessing {
     }
   }
 
-  private def extractMapExampleData( map ) {
+  private def extractMapExampleData(map) {
     int max = 0
     def fields = []
 
@@ -50,7 +51,7 @@ public class StoryProcessing {
       fields.add(key)
 
       if (!max)
-      max = value.size()
+        max = value.size()
     }
 
     return [max, fields]
@@ -60,34 +61,70 @@ public class StoryProcessing {
   private void processScenariosWithExampleMap(BehaviorStep scenario) {
     def (int max, fields) = extractMapExampleData(scenario.exampleData)
 
-    for (int idx = 0; idx < max; idx++) {
-      fields.each { field ->
-        currentContext.binding.setProperty field, scenario.exampleData[field][idx]
-      }
+    int oldIteration = currentIteration
+    currentIteration = 0
 
-      processScenario(scenario, true)
+    try {
+      for (int idx = 0; idx < max; idx++) {
+        fields.each { field ->
+          StoryContext.binding.setProperty field, scenario.exampleData[field][idx]
+        }
+
+        processScenario(scenario, true)
+      }
+    } finally {
+      currentIteration = oldIteration
     }
   }
 
   private void processScenarioWithExamples(BehaviorStep scenario) {
-    if ( scenario.exampleData instanceof Map ) {
+    if (scenario.exampleData instanceof Map) {
       processScenariosWithExampleMap scenario
     } else {
-      throw new IncorrectGrammarException("Don't know how to process example data in scenario ${scenario.name}" )
+      throw new IncorrectGrammarException("Don't know how to process example data in scenario ${scenario.name}")
     }
   }
 
-  private def processStepsUsingMap(StoryContext context) {
-    // collect field names
-    def (int max, fields) = extractMapExampleData(context.exampleData)
+  private def processStepsUsingMap(StoryContext context, map) {
+    def (int max, fields) = extractMapExampleData(map)
+    int oldIteration = currentIteration
+    currentIteration = 0
 
-    for (int idx = 0; idx < max; idx++) {
-      fields.each { field ->
-        context.binding.setProperty field, context.exampleData[field][idx]
+    try {
+      for (int idx = 0; idx < max; idx++) {
+        fields.each { field ->
+          context.binding.setProperty field, map[field][idx]
+        }
+
+        processStoryContext(context)
       }
-
-      processStoryContext(context)
+    } finally {
+      currentIteration = oldIteration
     }
+  }
+
+  private def processClosure(exampleData) {
+    def expando = new Expando( ['story':StoryContext.binding] )
+    
+    Closure c = exampleData
+    c.resolveStrategy = Closure.DELEGATE_FIRST
+    c.delegate = expando
+
+    c.call()
+
+    def map = expando.getProperties()
+    map.remove('story')
+
+    // if there is only 1 item and its a map, then use that instead
+    if ( map.size() == 1 ) {
+      def item = map.values().asList()
+      if ( item[0] instanceof Map )
+        map = item[0]
+    }
+
+    println "map is ${map}"
+
+    return map
   }
 
   /*
@@ -115,8 +152,11 @@ public class StoryProcessing {
           processStoryContext(context)
         else if (context.exampleData instanceof Map) {
           if (context.exampleData.size()) {
-            processStepsUsingMap(context)
+            processStepsUsingMap(context, context.exampleData)
           }
+        } else if ( context.exampleData instanceof Closure ) {
+          def map = processClosure(context.exampleData)
+          processStepsUsingMap(context, map)
         }
       } finally {
         if (context.afterScenarios)
@@ -153,6 +193,7 @@ public class StoryProcessing {
   }
 
   private def processChildStep(BehaviorStep childStep) {
+    childStep.decodeCurrentName StoryContext.binding, currentIteration
     listener.startStep(childStep)
 
     // figure out what to actually do
@@ -208,7 +249,10 @@ public class StoryProcessing {
   }
 
   private def processScenario(BehaviorStep step, isRealScenario) {
+
+    step.decodeCurrentName StoryContext.binding, currentIteration
     println "running scenario ${step.name}"
+
 
     listener.startStep(step)
     Result result;

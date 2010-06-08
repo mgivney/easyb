@@ -34,7 +34,7 @@ class StoryKeywords extends BehaviorKeywords {
    * @param closure
    */
   private void processExamplesClosure(description, data, closure) {
-    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure)
+    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure, currentStep)
 
     StoryContext ctx = new StoryContext()
 
@@ -130,7 +130,7 @@ class StoryKeywords extends BehaviorKeywords {
 
   def parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType type) {
     println "parseScenario"
-    def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure)
+    def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure, currentStep)
 
     currentStep = scenarioStep
 
@@ -175,7 +175,7 @@ class StoryKeywords extends BehaviorKeywords {
 
 
   private def addStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
-    BehaviorStep step = new BehaviorStep(inStepType, inStepName, closure)
+    BehaviorStep step = new BehaviorStep(inStepType, inStepName, closure, currentStep)
 
     if (closure == pendingClosure)
       step.pending = true
