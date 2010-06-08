@@ -2,12 +2,15 @@ package org.easyb
 
 import org.easyb.result.Result
 import org.easyb.util.BehaviorStepType
+import org.easyb.util.TextDecoder
 
 public class BehaviorStep implements Serializable {
   BehaviorStepType stepType
   BehaviorStep parentStep
   Result result
   String name
+
+  String currentStepName //
   String description
   long executionStartTime = 0
   long executionFinishTime = 0
@@ -17,40 +20,71 @@ public class BehaviorStep implements Serializable {
   def exampleData
   def exampleName
   StoryContext storyContext
+  private TextDecoder textDecoder;
 
   ArrayList<BehaviorStep> childSteps = new ArrayList<BehaviorStep>()
 
-  BehaviorStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
+  BehaviorStep(BehaviorStepType inStepType, String inStepName, Closure closure, BehaviorStep parent) {
     stepType = inStepType
-    name = inStepName
+    setName( inStepName )
     this.closure = closure
+    this.parentStep = parent
   }
 
   BehaviorStep(BehaviorStepType inStepType, String inStepName) {
-    this(inStepType, inStepName, null)
+    this(inStepType, inStepName, null, null)
+  }
+
+  public void setName( String name ) {
+    if ( name.indexOf('#') >= 0 )
+      textDecoder = new TextDecoder(name)
+
+    this.name = name;
+  }
+
+  public void decodeCurrentName(Binding binding, int iteration) {
+    binding.setProperty "iterationCount", iteration
+    binding.setProperty "easybStep", this
+
+    if ( textDecoder == null ) {
+      binding.setProperty "stepName", name
+    } else {
+      currentStepName = textDecoder.replace(binding, parentStep)
+      binding.setProperty "stepName", currentStepName
+    }
+
+
+  }
+
+  public String getName() {
+    if ( textDecoder != null && currentStepName != null )
+      return currentStepName
+    else
+      return name
   }
 
   def cloneStep(BehaviorStep into) {
     into.description = description
     into.closure = closure
-
-    cloneChildren(into)
+    into.name = name
+//
+//    cloneChildren(into)
   }
 
-  def cloneChildren(BehaviorStep into) {
-    childSteps.each { childStep ->
-      BehaviorStep step = new BehaviorStep(childStep.stepType, childStep.name, childStep.closure)
-      step.setParentStep into
-      into.childSteps.add(step)
-      childStep.fullClone(step)
-    }
-  }
-
-  protected fullClone(BehaviorStep into) {
-    into.description = description
-    
-    cloneChildren(into)
-  }
+//  def cloneChildren(BehaviorStep into) {
+//    childSteps.each { childStep ->
+//      BehaviorStep step = new BehaviorStep(childStep.stepType, childStep.name, childStep.closure, childStep.parentStep)
+//      step.setParentStep into
+//      into.childSteps.add(step)
+//      childStep.fullClone(step)
+//    }
+//  }
+//
+//  protected fullClone(BehaviorStep into) {
+//    into.description = description
+//
+//    cloneChildren(into)
+//  }
 
   def replay() {
     if ( closure != null ) {
