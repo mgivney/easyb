@@ -96,7 +96,7 @@ class StoryKeywords extends BehaviorKeywords {
    * @return
    */
   def sharedBehavior(description, closure) {
-    println "parse shared behavior ${description}"
+//    println "parse shared behavior ${description}"
     parseScenario(closure, description, BehaviorStepType.SHARED_BEHAVIOR)
   }
 
@@ -125,12 +125,12 @@ class StoryKeywords extends BehaviorKeywords {
   }
 
   def scenario(scenarioDescription, scenarioClosure) {
-    println "parsing scenario ${scenarioDescription}"
+//    println "parsing scenario ${scenarioDescription}"
     parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType.SCENARIO)
   }
 
   def parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType type) {
-    println "parseScenario"
+//    println "parseScenario"
     def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure, currentStep)
 
     def oldStep = currentStep
@@ -169,7 +169,7 @@ class StoryKeywords extends BehaviorKeywords {
 
     scenariosRun = true
 
-    println "running"
+//    println "running"
 
     StoryProcessing sp = new StoryProcessing()
     sp.processStory(topContext, executeStory, listener)
