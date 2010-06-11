@@ -11,4 +11,18 @@ class PluginLocator {
         }
         throw new RuntimeException("Plugin <${pluginName}> not found")
     }
+
+  public static def findAllExampleDataParsers() {
+    def dps = []
+
+    Service.providers(ExampleDataParser).each { parser ->
+      dps.add(parser)
+    }
+    
+//    dps.addAll( Service.providers(ExampleDataParser) )
+    dps.add( new ExampleAsMapDataParser() )
+    dps.add( new ExampleAsClosureDataParser() )
+
+    return dps
+  }
 }
