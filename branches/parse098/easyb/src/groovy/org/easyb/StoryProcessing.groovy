@@ -2,15 +2,22 @@ package org.easyb
 
 import org.easyb.listener.ExecutionListener
 import org.easyb.result.Result
+import org.easyb.plugin.PluginLocator
 
 import org.easyb.util.BehaviorStepType
+import org.easyb.plugin.ExampleDataParser
 
 public class StoryProcessing {
-  Stack<StoryContext> contextStack = new Stack<StoryContext>();
-  StoryContext currentContext = null
-  boolean executeStory
-  ExecutionListener listener
-  int currentIteration
+  private Stack<StoryContext> contextStack = new Stack<StoryContext>();
+  private StoryContext currentContext = null
+  private boolean executeStory
+  private ExecutionListener listener
+  private int currentIteration
+  private def exampleDataParsers
+
+  public StoryProcessing() {
+    exampleDataParsers = PluginLocator.findAllExampleDataParsers()
+  }
 
   public def processStory(StoryContext currentContext, boolean executeStory, ExecutionListener listener) {
     this.executeStory = executeStory
@@ -46,20 +53,6 @@ public class StoryProcessing {
     }
   }
 
-  private def extractMapExampleData(map) {
-    int max = 0
-    def fields = []
-
-    map.each { key, value ->
-      fields.add(key)
-
-      if (!max)
-        max = value.size()
-    }
-
-    return [max, fields]
-  }
-
   private def processStepsUsingMap(StoryContext context, map, BehaviorStep exampleStep) {
     def (int max, fields) = extractMapExampleData(map)
     int oldIteration = currentIteration
@@ -78,28 +71,42 @@ public class StoryProcessing {
     }
   }
 
-  private def processClosure(exampleData) {
-    def expando = new Expando( ['story':StoryContext.binding] )
-    
-    Closure c = exampleData
-    c.resolveStrategy = Closure.DELEGATE_FIRST
-    c.delegate = expando
+  private def  processStoryUsingExamples(StoryContext context, BehaviorStep exampleStep) {
+    int oldIteration = currentIteration
+    currentIteration = 0
 
-    def retVal = c.call()
+    def c = { map ->
+      map.each { key, value ->
+        context.binding.setProperty key, value
+      }
 
-    def map = expando.getProperties()
-    map.remove('story')
+      // don't use the more efficient putAll on variables as it may lead to odd behavior if the field is already in the binding, then
+      // get property would always pass back the binding field instead of the variables value
 
-    // if there is only 1 item and its a map, then use that instead
-    if ( map.size() == 1 ) {
-      def item = map.values().asList()
-      if ( item[0] instanceof Map )
-        map = item[0]
-    } else if ( map.size() == 0 && retVal instanceof Map )
-      map = retVal
+      try {
+        processStoryContext(context, exampleStep)
+        
+        currentIteration ++
+      } finally {
+        def v = context.binding.variables
 
-    return map
+        map.keySet().each { key ->
+          v.remove key
+        }
+      }
+    }
+
+    for( ExampleDataParser p : exampleDataParsers ) {
+      println p
+      if ( p.processData(context.exampleData, c, context.binding ) )
+        break
+    }
+
+
+    currentIteration = oldIteration
+
   }
+
 
   /*
     runs all of the scenarios, befores and afters in this context
@@ -124,14 +131,8 @@ public class StoryProcessing {
       try {
         if (!context.exampleData)
           processStoryContext(context, exampleStep)
-        else if (context.exampleData instanceof Map) {
-          if (context.exampleData.size()) {
-            processStepsUsingMap(context, context.exampleData, exampleStep)
-          }
-        } else if ( context.exampleData instanceof Closure ) {
-          def map = processClosure(context.exampleData)
-          processStepsUsingMap(context, map, exampleStep)
-        }
+        else
+          processStoryUsingExamples(context, exampleStep)
 
       } finally {
         if (context.afterScenarios)

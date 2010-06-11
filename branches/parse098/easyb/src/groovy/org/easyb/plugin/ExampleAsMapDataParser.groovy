@@ -1,9 +1,4 @@
-/*
- * Created by IntelliJ IDEA.
- * User: richard
- * Date: Jun 11, 2010
- * Time: 11:49:30 PM
- */
+
 package org.easyb.plugin;
 
 
