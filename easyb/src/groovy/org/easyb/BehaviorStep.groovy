@@ -17,8 +17,6 @@ public class BehaviorStep implements Serializable {
   public Closure closure
   boolean ignore
   boolean pending
-  def exampleData
-  def exampleName
   StoryContext storyContext
   private TextDecoder textDecoder;
 
@@ -33,6 +31,17 @@ public class BehaviorStep implements Serializable {
 
   BehaviorStep(BehaviorStepType inStepType, String inStepName) {
     this(inStepType, inStepName, null, null)
+  }
+
+  /**
+   * only example behaviours can have story contexts
+   *
+   * @param sc - the associated story context
+   */
+  public void setStoryContext(StoryContext sc) {
+    assert stepType == BehaviorStepType.EXAMPLES
+
+    this.storyContext = sc
   }
 
   public void setName( String name ) {
@@ -67,24 +76,8 @@ public class BehaviorStep implements Serializable {
     into.description = description
     into.closure = closure
     into.name = name
-//
-//    cloneChildren(into)
   }
 
-//  def cloneChildren(BehaviorStep into) {
-//    childSteps.each { childStep ->
-//      BehaviorStep step = new BehaviorStep(childStep.stepType, childStep.name, childStep.closure, childStep.parentStep)
-//      step.setParentStep into
-//      into.childSteps.add(step)
-//      childStep.fullClone(step)
-//    }
-//  }
-//
-//  protected fullClone(BehaviorStep into) {
-//    into.description = description
-//
-//    cloneChildren(into)
-//  }
 
   def replay() {
     if ( closure != null ) {
@@ -99,6 +92,11 @@ public class BehaviorStep implements Serializable {
     return childSteps[0].childSteps
     else
       return childSteps
+  }
+
+  public void removeChildStep(BehaviorStep step) {
+    childSteps.remove(step)
+    step.parentStep = null
   }
 
   public BehaviorStepType getStepType() {
@@ -118,6 +116,7 @@ public class BehaviorStep implements Serializable {
 
   def addChildStep(BehaviorStep step) {
     childSteps.add(step)
+    step.parentStep = this
   }
 
   long getScenarioCountRecursively() {

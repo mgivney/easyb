@@ -34,7 +34,7 @@ class StoryKeywords extends BehaviorKeywords {
    * @param closure
    */
   private void processExamplesClosure(description, data, closure) {
-    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure, currentStep)
+    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure, null)
 
     StoryContext ctx = new StoryContext()
 
@@ -60,6 +60,51 @@ class StoryKeywords extends BehaviorKeywords {
     }
   }
 
+  /*
+  * when we see a "where/examples" clause in a scenario, we
+  * 1) remove the scenario from the current context
+  * 2) tell the scenario's BehaviorStep parent to remove it as a child
+  *
+  * This decouples the scenario and leaves it hanging. We then
+  *
+  * - create a new step (examples)
+  * - add the scenario as a child step to the example
+  * - add the example step as a child of the scenario's old parent
+  * - create a new context
+  * - setup the 
+  * extract the where clause out, insert it at the same
+  * level as the scenario and then move the scenario underneath it.
+  */
+  private void insertExampleAboveScenario( BehaviorStep scenarioStep, String description, data ) {
+    // take scenario out of current context
+    currentContext.removeStep(scenarioStep)
+
+    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, null, scenarioStep.parentStep)
+
+    // if it is inside a parent (e.g. example), remove it
+    if ( scenarioStep.parentStep ) {
+      scenarioStep.parentStep.removeChildStep(scenarioStep)
+      scenarioStep.parentStep.addChildStep(step)
+    }
+    
+    step.addChildStep(scenarioStep)
+    
+    currentContext.addStep(step)
+
+    // create a new context for it to go into
+    StoryContext ctx = new StoryContext()
+
+    // exampleStep should be in the parent context
+    step.storyContext = ctx
+    // scenarioStep should be in the child context
+    ctx.parentContext = currentContext
+
+    ctx.addStep(scenarioStep)
+
+    ctx.exampleData = data
+    ctx.exampleStep = step
+  }
+
   def examples(description, data, closure) {
     if (currentStep && currentStep.stepType != BehaviorStepType.EXAMPLES && currentStep.stepType != BehaviorStepType.SCENARIO) {
       throw new IncorrectGrammarException("examples keyword were it should not exist.")
@@ -82,9 +127,9 @@ class StoryKeywords extends BehaviorKeywords {
         throw new IncorrectGrammarException("examples keyword inside an examples closure must also pass a closure for context")
       
       processExamplesClosure(description, data, closure)
-    } else { // we are in a scenario, so lets associate the content with it
-      currentStep.exampleData = data
-      currentStep.exampleName = description
+    } else {
+      // we are in a scenario, so we create an example node and put the scenario inside it
+      insertExampleAboveScenario( currentStep, description, data )
     }
   }
 
@@ -125,13 +170,11 @@ class StoryKeywords extends BehaviorKeywords {
   }
 
   def scenario(scenarioDescription, scenarioClosure) {
-//    println "parsing scenario ${scenarioDescription}"
     parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType.SCENARIO)
   }
 
   def parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType type) {
-//    println "parseScenario"
-    def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure, currentStep)
+    def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure, null) // scenarios never have parent steps
 
     def oldStep = currentStep
     currentStep = scenarioStep
@@ -143,10 +186,9 @@ class StoryKeywords extends BehaviorKeywords {
       scenarioStep.pending = true
     } else {
       if (type == BehaviorStepType.SCENARIO)
-      currentContext.addStep(scenarioStep)
-
-      if (type == BehaviorStepType.SHARED_BEHAVIOR)
-      currentContext.sharedScenarios[scenarioStep.name] = scenarioStep
+        currentContext.addStep(scenarioStep)
+      else if (type == BehaviorStepType.SHARED_BEHAVIOR)
+        currentContext.sharedScenarios[scenarioStep.name] = scenarioStep
 
       scenarioClosure() // now parse the scenario
     }
@@ -168,8 +210,6 @@ class StoryKeywords extends BehaviorKeywords {
     StoryContext.binding = binding
 
     scenariosRun = true
-
-//    println "running"
 
     StoryProcessing sp = new StoryProcessing()
     sp.processStory(topContext, executeStory, listener)

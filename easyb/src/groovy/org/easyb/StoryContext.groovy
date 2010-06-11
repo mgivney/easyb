@@ -47,19 +47,6 @@ public class StoryContext {
   /* map or array data */
   def exampleData
 
-  /*
-  * Make sure all parent plugins get fired as well 
-  */
-  public def getActivePlugins() {
-    def p = new ArrayList<EasybPlugin>()
-    p.addAll(activePlugins)
-
-    if ( parentContext )
-      p.addAll(parentContext.activePlugins)
-
-    return p
-  }
-
   public void addPlugin(plugin) {
     if (!activePlugins.contains(plugin))
       activePlugins.add(plugin)
@@ -69,9 +56,25 @@ public class StoryContext {
     activePlugins.each { plugin -> 
       closure( plugin, binding )
     }
+
+    if ( parentContext )
+      parentContext.notifyPlugins(closure)
   }
 
   public void addStep(BehaviorStep step) {
     steps.add(step)
+  }
+
+  public void removeStep(BehaviorStep step) {
+    steps.remove(step)
+  }
+
+  public BehaviorStep findSharedScenario(String name) {
+    def ss = sharedScenarios[name]
+
+    if ( !ss && parentContext )
+      return parentContext.findSharedScenario(name)
+    else
+      return ss
   }
 }

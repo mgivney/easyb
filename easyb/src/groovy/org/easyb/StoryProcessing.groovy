@@ -16,10 +16,10 @@ public class StoryProcessing {
     this.executeStory = executeStory
     this.listener = listener
 
-    runContext(currentContext)
+    runContext(currentContext, null)
   }
 
-  private def processStoryContext(StoryContext context) {
+  private def processStoryContext(StoryContext context, BehaviorStep exampleStep) {
     context.steps.each { BehaviorStep step ->
       if (step.stepType == BehaviorStepType.SCENARIO) {
         if (step.ignore) {
@@ -30,15 +30,18 @@ public class StoryProcessing {
           listener.startStep step
           step.closure()
           listener.stopStep()
-        } else if (step.exampleData) {
-          processScenarioWithExamples step
         } else {
           processScenario step, true
         }
       } else if (step.stepType == BehaviorStepType.EXAMPLES) {
-        runContext(step.storyContext)
+        runContext(step.storyContext, step)
       } else {
         processChildStep step
+      }
+    }
+    if ( exampleStep && exampleStep.childSteps.size() > 0 ) {
+      exampleStep.childSteps.each { childStep ->
+        processChildStep childStep
       }
     }
   }
@@ -57,37 +60,7 @@ public class StoryProcessing {
     return [max, fields]
   }
 
-
-  private void processScenariosWithExampleMap(BehaviorStep scenario, map) {
-    def (int max, fields) = extractMapExampleData(map)
-
-    int oldIteration = currentIteration
-    currentIteration = 0
-
-    try {
-      for (int idx = 0; idx < max; idx++) {
-        fields.each { field ->
-          StoryContext.binding.setProperty field, map[field][idx]
-        }
-
-        processScenario(scenario, true)
-      }
-    } finally {
-      currentIteration = oldIteration
-    }
-  }
-
-  private void processScenarioWithExamples(BehaviorStep scenario) {
-    if (scenario.exampleData instanceof Map) {
-      processScenariosWithExampleMap scenario, scenario.exampleData
-    } else if ( scenario.exampleData instanceof Closure ) {
-      processScenariosWithExampleMap scenario, processClosure(scenario.exampleData)
-    } else {
-      throw new IncorrectGrammarException("Don't know how to process example data in scenario ${scenario.name}")
-    }
-  }
-
-  private def processStepsUsingMap(StoryContext context, map) {
+  private def processStepsUsingMap(StoryContext context, map, BehaviorStep exampleStep) {
     def (int max, fields) = extractMapExampleData(map)
     int oldIteration = currentIteration
     currentIteration = 0
@@ -98,7 +71,7 @@ public class StoryProcessing {
           context.binding.setProperty field, map[field][idx]
         }
 
-        processStoryContext(context)
+        processStoryContext(context, exampleStep)
       }
     } finally {
       currentIteration = oldIteration
@@ -132,7 +105,7 @@ public class StoryProcessing {
     runs all of the scenarios, befores and afters in this context
    */
 
-  private def runContext(StoryContext context) {
+  private def runContext(StoryContext context, BehaviorStep exampleStep) {
     if (currentContext != null)
       contextStack.push(currentContext)
 
@@ -150,15 +123,16 @@ public class StoryProcessing {
 
       try {
         if (!context.exampleData)
-          processStoryContext(context)
+          processStoryContext(context, exampleStep)
         else if (context.exampleData instanceof Map) {
           if (context.exampleData.size()) {
-            processStepsUsingMap(context, context.exampleData)
+            processStepsUsingMap(context, context.exampleData, exampleStep)
           }
         } else if ( context.exampleData instanceof Closure ) {
           def map = processClosure(context.exampleData)
-          processStepsUsingMap(context, map)
+          processStepsUsingMap(context, map, exampleStep)
         }
+
       } finally {
         if (context.afterScenarios)
           processScenario(context.afterScenarios, false)
@@ -174,7 +148,7 @@ public class StoryProcessing {
 
 
   private def processSharedScenarios(sharedStep) {
-    BehaviorStep shared = currentContext.sharedScenarios[sharedStep.name]
+    BehaviorStep shared = currentContext.findSharedScenario(sharedStep.name)
 
     if (!shared) { // can't find the shared scenario
       listener.startStep(sharedStep)
