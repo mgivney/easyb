@@ -1,11 +1,15 @@
+package org.easyb.where
 
 /*
-Example tests a map at the story level 
+Example tests a map at the story level
  */
 
 numberArray = [12, 8, 20, 199]
 
-examples "Number examples with #text and #number", [text:["12", "8", "20", "199"], number:numberArray]
+examples "Number examples with '#{text}' and #number", {
+  text = ["12", "8", "20", "199"]
+  number = story.numberArray
+}
 
 before "Before we start running the examples", {
   given "an initial value for counters", {
@@ -16,7 +20,7 @@ before "Before we start running the examples", {
   }
 }
 
-scenario "Text #text should equal #number", {
+scenario "Text '#{text}' should equal #number", {
   when "we parse #text", {
     parsedValue = Integer.parseInt(text)
     whenCount ++

@@ -14,35 +14,27 @@ class StoryBinding extends Binding {
     this.story = new StoryKeywords(listener)
 
     where = { description, exampleData, closure = null ->
-      if ( exampleData != null ) {
-        story.examples( description, exampleData, closure )
+      if (exampleData != null) {
+        story.examples(description, exampleData, closure)
       }
     }
 
     examples = { description, exampleData, closure = null ->
-      if ( exampleData != null ) {
-        story.examples( description, exampleData, closure )
+      if (exampleData != null) {
+        story.examples(description, exampleData, closure)
       }
     }
 
-//    examples = { description = "", exampleData = null, closure = null ->
-//      if ( exampleData != null ) {
-//        story.examples( description, exampleData, closure )
-//      }
-//    }
-
-//    before_examples = {description = "", closure = {} ->
-//      story.before_examples(description, closure)
-//    }
-//
-//    after_examples = {description = "", closure = {} ->
-//      story.after_examples(description, closure)
-//    }
-
-    using = {pluginName ->
+    using = {pluginName, pluginVariableName = null ->
       plugin = new PluginLocator().findPluginWithName(pluginName)
 
-      story.addPlugin( plugin )
+      if (plugin) {
+        story.addPlugin(plugin)
+
+        if (pluginVariableName) {
+          setProperty(pluginVariableName, plugin)
+        }
+      }
     }
 
     before = {description = "", closure = {} ->
@@ -68,9 +60,9 @@ class StoryBinding extends Binding {
       story.scenario(description, closure)
     }
 
-    runScenarios = { ->
+    runScenarios = {->
       println "running story"
-      story.replaySteps( true, this)
+      story.replaySteps(true, this)
     }
 
     then = {spec, closure = story.pendingClosure ->
@@ -113,14 +105,14 @@ class StoryBinding extends Binding {
       //nop
     }
 
-       
-    ignore = {Object ... scenarios ->
+
+    ignore = {Object... scenarios ->
       if (scenarios.size() == 1) {
         def objscn = scenarios[0]
 
-        if ( objscn instanceof String )
+        if (objscn instanceof String)
           story.ignore(objscn)
-        else if ( objscn == all || !(objscn instanceof Closure) ) {
+        else if (objscn == all || !(objscn instanceof Closure)) {
           try {
             objscn.call()
           } catch (excep) {
@@ -130,7 +122,7 @@ class StoryBinding extends Binding {
               story.ignore(scenarios[0])
             }
           }
-        } else if ( objscn instanceof Closure ) {
+        } else if (objscn instanceof Closure) {
           story.ignoreOn()
 
           try {

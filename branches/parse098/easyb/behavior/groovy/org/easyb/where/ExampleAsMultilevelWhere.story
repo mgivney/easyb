@@ -1,3 +1,4 @@
+package org.easyb.where
 /*
 Example tests a map at the story level
 */

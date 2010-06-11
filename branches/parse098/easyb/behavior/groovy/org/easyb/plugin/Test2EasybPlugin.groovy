@@ -2,7 +2,8 @@ package org.easyb.plugin
 
 import org.easyb.plugin.BasePlugin
 
-class TestEasybPlugin extends BasePlugin {
+
+class Test2EasybPlugin extends BasePlugin {
     static resetAllCounts() {
         beforeScenarioCount = 0
         afterScenarioCount = 0
@@ -13,7 +14,7 @@ class TestEasybPlugin extends BasePlugin {
         beforeThenCount = 0
         afterThenCount = 0
     }
-    
+
     static int beforeScenarioCount
     static int afterScenarioCount
     static int beforeGivenCount
@@ -25,7 +26,7 @@ class TestEasybPlugin extends BasePlugin {
     static int beforeStoryCount
 
     public String getName() {
-        return "test"
+        return "test2"
     }
 
     def beforeStory(Binding binding) {
@@ -59,10 +60,8 @@ class TestEasybPlugin extends BasePlugin {
     def beforeThen(Binding binding) {
         beforeThenCount++
     }
-    
+
     def afterThen(Binding binding) {
         afterThenCount++
     }
-
-
 }
