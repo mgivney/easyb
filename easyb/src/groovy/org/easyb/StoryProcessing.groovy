@@ -97,7 +97,6 @@ public class StoryProcessing {
     }
 
     for( ExampleDataParser p : exampleDataParsers ) {
-      println p
       if ( p.processData(context.exampleData, c, context.binding ) )
         break
     }
