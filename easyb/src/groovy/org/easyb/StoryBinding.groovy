@@ -2,6 +2,9 @@ package org.easyb
 
 import org.easyb.listener.ExecutionListener
 import org.easyb.plugin.PluginLocator
+import org.easyb.exception.VerificationException
+
+
 
 class StoryBinding extends Binding {
   StoryKeywords story
@@ -28,12 +31,10 @@ class StoryBinding extends Binding {
     using = {pluginName, pluginVariableName = null ->
       plugin = new PluginLocator().findPluginWithName(pluginName)
 
-      if (plugin) {
-        story.addPlugin(plugin)
+      story.addPlugin(plugin)
 
-        if (pluginVariableName) {
-          setProperty(pluginVariableName, plugin)
-        }
+      if (pluginVariableName) {
+        setProperty(pluginVariableName, plugin)
       }
     }
 
