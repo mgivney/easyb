@@ -1,0 +1,117 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.easyb</groupId>
+  <artifactId>easyb</artifactId>
+  <packaging>jar</packaging>
+  <version>0.9.8.1</version>
+  <name>easyb</name>
+  <description>A behavior driven development framework for the Java platform</description>
+  <url>http://www.easyb.org</url>
+
+  <developers>
+    <developer>
+      <id>ajglover</id>
+      <name>Andy Glover</name>
+    </developer>
+    <developer>
+      <id>kenneth.s.brooks</id>
+      <name>Ken Brooks</name>
+    </developer>
+    <developer>
+      <id>rfciii</id>
+      <name>Rod Coffin</name>
+      <email>rod@rodcoffin.com</email>
+      <url>http://www.rodcoffin.com</url>
+    </developer>
+    <developer>
+      <id>richard.vowles</id>
+      <name>Richard Vowles</name>
+      <email>richard@bluetrainsoftware.com</email>
+      <url>http://www.bluetrainsoftware.com</url>
+	</developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:svn:http://easyb.googlecode.com/svn/trunk/</connection>
+    <developerConnection>scm:svn:https://easyb.googlecode.com/svn/trunk/</developerConnection>
+    <url>http://code.google.com/p/easyb/source/browse/#svn/trunk/easyb</url>
+  </scm>
+
+  <mailingLists>
+    <mailingList>
+      <name>easyb users</name>
+      <archive>http://groups.google.com/group/easyb-users</archive>
+      <subscribe>http://groups.google.com/group/easyb-users</subscribe>
+      <unsubscribe>http://groups.google.com/group/easyb-users</unsubscribe>
+      <post>http://groups.google.com/group/easyb-users</post>
+    </mailingList>
+    <mailingList>
+      <name>easyb dev</name>
+      <archive>http://groups.google.com/group/easyb-dev</archive>
+      <subscribe>http://groups.google.com/group/easyb-dev</subscribe>
+      <unsubscribe>http://groups.google.com/group/easyb-dev</unsubscribe>
+      <post>http://groups.google.com/group/easyb-dev</post>
+    </mailingList>
+    <mailingList>
+      <name>easyb commits</name>
+      <archive>http://groups.google.com/group/easyb-commits</archive>
+      <subscribe>http://groups.google.com/group/easyb-commits</subscribe>
+      <unsubscribe>http://groups.google.com/group/easyb-commits</unsubscribe>
+      <post>http://groups.google.com/group/easyb-commits</post>
+    </mailingList>
+  </mailingLists>
+
+  <issueManagement>
+    <system>Google Code</system>
+    <url>http://code.google.com/p/easyb/issues/</url>
+  </issueManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>1.7.2</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.jvnet.wagon-svn</groupId>
+        <artifactId>wagon-svn</artifactId>
+        <version>1.9</version>
+      </extension>
+    </extensions>
+  </build>
+
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>temp-easyb-maven-repo</id>
+      <url>svn:https://easyb.googlecode.com/svn/maven/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+<repositories>
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
+    </repository>
+  </repositories>
+</project>
