@@ -5,9 +5,12 @@ import org.easyb.BehaviorStep
 import org.easyb.exception.VerificationException
 import org.easyb.listener.ResultsCollector
 import org.easyb.util.BehaviorStepType
+import org.easyb.listener.ResultsAmalgamator
+import org.easyb.listener.ResultsReporter
 
 class XmlReportWriter implements ReportWriter {
     private String location
+    private String errorLocation
     private static final String DEFAULT_LOC_NAME = "easyb-report.xml";
 
     public XmlReportWriter() {
@@ -100,9 +103,10 @@ class XmlReportWriter implements ReportWriter {
 
     }
 
-    public void writeReport(ResultsCollector results) {
-        Writer writer = new BufferedWriter(new FileWriter(new File(location)))
+    public void writeReport(ResultsAmalgamator amal) {
+        ResultsReporter results = amal.getResultsReporter()
 
+        Writer writer = new BufferedWriter(new FileWriter(new File(location)))
 
         def xml = new MarkupBuilder(writer)
 
@@ -120,5 +124,6 @@ class XmlReportWriter implements ReportWriter {
             }
         }
         writer.close()
+
     }
 }

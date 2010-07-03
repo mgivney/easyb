@@ -17,10 +17,10 @@ class StoryKeywords extends BehaviorKeywords {
   StoryContext currentContext
   BehaviorStep currentStep
 
-  StoryKeywords(ExecutionListener listener) {
+  StoryKeywords(ExecutionListener listener, Binding binding) {
     super(listener)
 
-    topContext = new StoryContext()
+    topContext = new StoryContext(binding)
     currentContext = topContext
   }
 
@@ -36,11 +36,9 @@ class StoryKeywords extends BehaviorKeywords {
   private void processExamplesClosure(description, data, closure) {
     def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure, null)
 
-    StoryContext ctx = new StoryContext()
+    StoryContext ctx = new StoryContext(currentContext)
 
     step.storyContext = ctx
-    ctx.parentContext = currentContext
-
     currentContext = ctx
 
     ctx.exampleData = data
@@ -92,12 +90,10 @@ class StoryKeywords extends BehaviorKeywords {
     currentContext.addStep(step)
 
     // create a new context for it to go into
-    StoryContext ctx = new StoryContext()
+    StoryContext ctx = new StoryContext(currentContext)
 
     // exampleStep should be in the parent context
     step.storyContext = ctx
-    // scenarioStep should be in the child context
-    ctx.parentContext = currentContext
 
     ctx.addStep(scenarioStep)
 
@@ -175,6 +171,7 @@ class StoryKeywords extends BehaviorKeywords {
 
   def parseScenario(scenarioClosure, scenarioDescription, BehaviorStepType type) {
     def scenarioStep = new BehaviorStep(type, scenarioDescription, scenarioClosure, null) // scenarios never have parent steps
+    scenarioStep.storyContext = currentContext
 
     def oldStep = currentStep
     currentStep = scenarioStep
@@ -207,8 +204,6 @@ class StoryKeywords extends BehaviorKeywords {
     if (scenariosRun)
       return
 
-    StoryContext.binding = binding
-
     scenariosRun = true
 
     StoryProcessing sp = new StoryProcessing()
@@ -218,6 +213,7 @@ class StoryKeywords extends BehaviorKeywords {
 
   private def addStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
     BehaviorStep step = new BehaviorStep(inStepType, inStepName, closure, currentStep)
+    step.storyContext = currentContext
 
     if (closure == pendingClosure)
       step.pending = true

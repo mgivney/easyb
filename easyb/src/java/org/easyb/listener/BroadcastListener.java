@@ -4,55 +4,85 @@ import org.easyb.BehaviorStep;
 import org.easyb.domain.Behavior;
 import org.easyb.result.Result;
 
-import java.util.ArrayList;
 import java.util.List;
 
+
 public class BroadcastListener implements ExecutionListener {
-    public List<ExecutionListener> listeners = new ArrayList<ExecutionListener>();
+  private final List<ExecutionListener> listeners;
 
-    public void registerListener(ExecutionListener recipient) {
-        listeners.add(recipient);
+  private ResultsCollector resultsCollector;
+  private FailureDetector failureDetected;
+
+  public BroadcastListener() {
+    this.listeners = ListenerFactory.getActiveList();
+    resultsCollector = new ResultsCollector();
+    failureDetected = new FailureDetector();
+
+    listeners.add(resultsCollector);
+    listeners.add(failureDetected);
+
+    listeners.add(new ConsoleReporterListener());
+  }
+
+  public ResultsCollector getResultsCollector() {
+    return resultsCollector;
+  }
+
+  /**
+   * allows us to get a specific listener from this list
+   *
+   * @param clazz - the class of the listener
+   * @return null if not found or the found listener
+   */
+  public ExecutionListener getTypedListener(Class clazz) {
+    for (ExecutionListener el : listeners) {
+      if (el.getClass() == clazz) {
+        return el;
+      }
     }
 
-    public void startBehavior(Behavior behavior) {
-        for (ExecutionListener listener : listeners) {
-            listener.startBehavior(behavior);
-        }
-    }
+    return null;
+  }
 
-    public void stopBehavior(BehaviorStep step, Behavior behavior) {
-        for (ExecutionListener listener : listeners) {
-            listener.stopBehavior(step, behavior);
-        }
+  public void startBehavior(Behavior behavior) {
+    for (ExecutionListener listener : listeners) {
+      listener.startBehavior(behavior);
     }
+  }
 
-    public void startStep(BehaviorStep step) {
-        for (ExecutionListener listener : listeners) {
-            listener.startStep(step);
-        }
+  public void stopBehavior(BehaviorStep step, Behavior behavior) {
+    for (ExecutionListener listener : listeners) {
+      listener.stopBehavior(step, behavior);
     }
+  }
 
-    public void describeStep(String description) {
-        for (ExecutionListener listener : listeners) {
-            listener.describeStep(description);
-        }
+  public void startStep(BehaviorStep step) {
+    for (ExecutionListener listener : listeners) {
+      listener.startStep(step);
     }
+  }
 
-    public void completeTesting() {
-        for (ExecutionListener listener : listeners) {
-            listener.completeTesting();
-        }
+  public void describeStep(String description) {
+    for (ExecutionListener listener : listeners) {
+      listener.describeStep(description);
     }
+  }
 
-    public void stopStep() {
-        for (ExecutionListener listener : listeners) {
-            listener.stopStep();
-        }
+  public void completeTesting() {
+    for (ExecutionListener listener : listeners) {
+      listener.completeTesting();
     }
+  }
 
-    public void gotResult(Result result) {
-        for (ExecutionListener listener : listeners) {
-            listener.gotResult(result);
-        }
+  public void stopStep() {
+    for (ExecutionListener listener : listeners) {
+      listener.stopStep();
     }
+  }
+
+  public void gotResult(Result result) {
+    for (ExecutionListener listener : listeners) {
+      listener.gotResult(result);
+    }
+  }
 }

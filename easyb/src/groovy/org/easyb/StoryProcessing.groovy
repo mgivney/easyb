@@ -167,7 +167,7 @@ public class StoryProcessing {
   }
 
   private def processChildStep(BehaviorStep childStep) {
-    childStep.decodeCurrentName StoryContext.binding, currentIteration
+    childStep.decodeCurrentName currentIteration
     listener.startStep(childStep)
 
     // figure out what to actually do
@@ -224,7 +224,7 @@ public class StoryProcessing {
 
   private def processScenario(BehaviorStep step, isRealScenario) {
 
-    step.decodeCurrentName StoryContext.binding, currentIteration
+    step.decodeCurrentName currentIteration
 //    println "running scenario ${step.name}"
 
 

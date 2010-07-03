@@ -13,6 +13,16 @@ import org.easyb.util.BehaviorStepType;
 
 public class StoryContext {
 
+  public StoryContext(Binding binding) {
+    this.binding = binding
+    this.parentContext = null
+  }
+
+  public StoryContext(StoryContext parentContext) {
+    this.binding = parentContext.binding
+    this.parentContext = parentContext
+  }
+
   /**
    * all of the scenarios in this context. These get evaluated when the context gets evaluated
    */
@@ -39,7 +49,7 @@ public class StoryContext {
   BehaviorStep afterEach
 
   ArrayList<EasybPlugin> activePlugins = new ArrayList<EasybPlugin>()
-  static Binding binding  // this is constant across all contexts
+  Binding binding  // this is constant across all contexts
 
   /* the behavior that represents the example data, output for reporting each time we loop*/
   BehaviorStep exampleStep
