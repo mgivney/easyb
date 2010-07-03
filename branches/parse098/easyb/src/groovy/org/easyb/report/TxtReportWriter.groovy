@@ -3,6 +3,8 @@ package org.easyb.report
 import org.easyb.listener.ResultsCollector
 import org.easyb.result.Result
 import org.easyb.util.BehaviorStepType
+import org.easyb.listener.ResultsReporter
+import org.easyb.listener.ResultsAmalgamator
 
 public abstract class TxtReportWriter implements ReportWriter {
   protected String location;
@@ -15,14 +17,16 @@ public abstract class TxtReportWriter implements ReportWriter {
 
   ;
 
-  protected abstract String getResultsAsText(ResultsCollector results)
+  protected abstract String getResultsAsText(ResultsReporter results)
 
   ;
 
   /**
    *
    */
-  void writeReport(ResultsCollector results) {
+  void writeReport(ResultsAmalgamator amal) {
+    ResultsReporter results = amal.getResultsReporter()
+    
     Writer writer = getWriter()
     writer.writeLine(getResultsAsText(results))
     results.genesisStep.getChildrenOfType(getGenesisType()).each {genesisChild ->
@@ -61,19 +65,21 @@ public abstract class TxtReportWriter implements ReportWriter {
   def getFailedAndPendingBehaviorsText(element) {
     if (element.result?.pending()) {
       return " [PENDING]"
-    } else if (element.result == Result.FAILED) {
-      return "\n\n	Failure -> ${element.name} ${element.description}\n${element.failuremessage}"
+/*   } else if (element.result?.failed()) {
+      return "\n\n  Failure -> ${element.stepType} ${element.description?element.description:""} ${element.result?.cause()?.getMessage()}\n}" */
     } else {
       switch (element.stepType) {
         case BehaviorStepType.GIVEN:
         case BehaviorStepType.WHEN:
         case BehaviorStepType.THEN:
         case BehaviorStepType.AND:
+        case BehaviorStepType.IT:
           if (element.result?.failed()) {
             return " [FAILURE: ${element.result?.cause()?.getMessage()}]"
           }
           break;
         case BehaviorStepType.SCENARIO:
+        case BehaviorStepType.SPECIFICATION:
           if (element.getChildSteps().size == 0) {
             //a scenario w/out child scenarioSteps is pending or ignored
             return element.result?.pending() ? " [PENDING]" : " [IGNORED]"

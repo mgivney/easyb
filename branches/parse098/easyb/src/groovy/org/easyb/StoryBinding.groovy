@@ -14,7 +14,7 @@ class StoryBinding extends Binding {
   }
 
   def StoryBinding(ExecutionListener listener) {
-    this.story = new StoryKeywords(listener)
+    this.story = new StoryKeywords(listener, this)
 
     where = { description, exampleData, closure = null ->
       if (exampleData != null) {

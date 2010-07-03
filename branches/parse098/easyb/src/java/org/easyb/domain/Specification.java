@@ -23,7 +23,7 @@ public class Specification extends BehaviorBase {
         return "specification";
     }
 
-    public BehaviorStep execute(ExecutionListener listener) throws IOException {
+    public BehaviorStep execute() throws IOException {
         BehaviorStep currentStep = new BehaviorStep(BehaviorStepType.SPECIFICATION, getPhrase());
 
         listener.startBehavior(this);

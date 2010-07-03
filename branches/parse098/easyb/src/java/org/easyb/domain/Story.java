@@ -29,7 +29,7 @@ public class Story extends BehaviorBase {
     return "story";
   }
 
-  public BehaviorStep execute(ExecutionListener listener) throws IOException {
+  public BehaviorStep execute() throws IOException {
     File file = getFile();
     String story = readStory(file);
     if (containsTag(story, this.getTags())) {

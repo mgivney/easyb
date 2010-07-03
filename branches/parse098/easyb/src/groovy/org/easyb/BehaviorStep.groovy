@@ -33,17 +33,6 @@ public class BehaviorStep implements Serializable {
     this(inStepType, inStepName, null, null)
   }
 
-  /**
-   * only example behaviours can have story contexts
-   *
-   * @param sc - the associated story context
-   */
-  public void setStoryContext(StoryContext sc) {
-    assert stepType == BehaviorStepType.EXAMPLES
-
-    this.storyContext = sc
-  }
-
   public void setName( String name ) {
     if ( name.indexOf('#') >= 0 )
       textDecoder = new TextDecoder(name)
@@ -51,7 +40,9 @@ public class BehaviorStep implements Serializable {
     this.name = name;
   }
 
-  public void decodeCurrentName(Binding binding, int iteration) {
+  public void decodeCurrentName(int iteration) {
+    Binding binding = storyContext.binding
+    
     binding.setProperty "iterationCount", iteration
     binding.setProperty "easybStep", this
 
@@ -61,8 +52,6 @@ public class BehaviorStep implements Serializable {
       currentStepName = textDecoder.replace(binding, parentStep)
       binding.setProperty "stepName", currentStepName
     }
-
-
   }
 
   public String getName() {
