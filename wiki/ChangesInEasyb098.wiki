@@ -6,6 +6,8 @@ There is a fundamental change in how easyb works in 0.9.8 in relation to *storie
 
 Other things are being added by other people and this list is maintained in a separate wiki page. 
 
+*This is not an "official" build of easyb 0.9.8, it is just a place to put it for those who are interested in working with functionality as it becomes available*.
+
 = Availability =
 
 Builds of Easyb 0.9.8 are being released in stages as functionality is slowly being added. This allows people to test their scripts against the new functionality - but be aware that if you delve into the internals too much, you may find them changing on you. These updates are available in the maven repository in http://code.google.com/p/easyb/source/browse/#svn/maven/maven2 - wagon is being a bit temperamental about ensuring the latest release is really the latest release so manually poking around now is the best idea. Once this is fixed, this document will update and your ivy or maven dependency range should look like this: [0.9.8.0, 0.9.8.999)
