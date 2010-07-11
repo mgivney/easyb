@@ -2,6 +2,7 @@ package org.easyb.listener;
 
 import org.easyb.BehaviorStep;
 import org.easyb.domain.Behavior;
+import org.easyb.result.ReportingTag;
 import org.easyb.result.Result;
 
 import java.util.List;
@@ -53,6 +54,12 @@ public class BroadcastListener implements ExecutionListener {
   public void stopBehavior(BehaviorStep step, Behavior behavior) {
     for (ExecutionListener listener : listeners) {
       listener.stopBehavior(step, behavior);
+    }
+  }
+
+  public void tag(ReportingTag tag) {
+    for (ExecutionListener listener : listeners) {
+      listener.tag(tag);
     }
   }
 

@@ -3,6 +3,7 @@ package org.easyb
 import org.easyb.result.Result
 import org.easyb.util.BehaviorStepType
 import org.easyb.util.TextDecoder
+import org.easyb.result.ReportingTag
 
 public class BehaviorStep implements Serializable {
   BehaviorStepType stepType
@@ -14,13 +15,16 @@ public class BehaviorStep implements Serializable {
   String description
   long executionStartTime = 0
   long executionFinishTime = 0
-  public Closure closure
+  Closure closure
   boolean ignore
   boolean pending
   StoryContext storyContext
   private TextDecoder textDecoder;
+  private List<ReportingTag> tags;
 
   ArrayList<BehaviorStep> childSteps = new ArrayList<BehaviorStep>()
+  ExtensionPoint extensionPoint; // if behavior step is extension point type, will have one of these
+
 
   BehaviorStep(BehaviorStepType inStepType, String inStepName, Closure closure, BehaviorStep parent) {
     stepType = inStepType
@@ -59,6 +63,18 @@ public class BehaviorStep implements Serializable {
       return currentStepName
     else
       return name
+  }
+
+  /**
+   * lazy add tags
+   *
+   * @param tag - a reporting tag
+   */
+  public void addReportingTag(ReportingTag tag) {
+    if ( tags == null )
+      tags = new ArrayList<ReportingTag>()
+
+    tags.add(tag)
   }
 
   def cloneStep(BehaviorStep into) {
@@ -408,7 +424,7 @@ public class BehaviorStep implements Serializable {
       case BehaviorStepType.NARRATIVE_BENEFIT:
       case BehaviorStepType.BEFORE:
       case BehaviorStepType.AFTER:
-      case BehaviorStepType.EXAMPLES:
+      case BehaviorStepType.WHERE:
       case BehaviorStepType.BEFORE_EACH:
       case BehaviorStepType.AFTER_EACH:
       case BehaviorStepType.IT:
@@ -416,6 +432,8 @@ public class BehaviorStep implements Serializable {
       case BehaviorStepType.GIVEN:
       case BehaviorStepType.THEN:
         formattedElement = "${spaces}${typeFormat} ${name}"
+        break
+      case BehaviorStepType.EXTENSION_POINT:
         break
       case BehaviorStepType.AND:
         formattedElement = "${spaces}${typeFormat}"

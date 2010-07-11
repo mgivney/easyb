@@ -10,13 +10,21 @@ import org.easyb.plugin.ExampleDataParser
 public class StoryProcessing {
   private Stack<StoryContext> contextStack = new Stack<StoryContext>();
   private StoryContext currentContext = null
+  private BehaviorStep currentStep
   private boolean executeStory
   private ExecutionListener listener
   private int currentIteration
   private def exampleDataParsers
+  private def extensionCategories = []
+  private def additionalExtensionCategories
 
-  public StoryProcessing() {
+  public StoryProcessing(additionalExtensionCategories) {
     exampleDataParsers = PluginLocator.findAllExampleDataParsers()
+
+    extensionCategories.addAll(additionalExtensionCategories)
+    extensionCategories.add(BehaviorCategory.class)
+
+    this.additionalExtensionCategories = additionalExtensionCategories
   }
 
   public def processStory(StoryContext currentContext, boolean executeStory, ExecutionListener listener) {
@@ -40,7 +48,7 @@ public class StoryProcessing {
         } else {
           processScenario step, true
         }
-      } else if (step.stepType == BehaviorStepType.EXAMPLES) {
+      } else if (step.stepType == BehaviorStepType.WHERE) {
         runContext(step.storyContext, step)
       } else {
         processChildStep step
@@ -50,24 +58,6 @@ public class StoryProcessing {
       exampleStep.childSteps.each { childStep ->
         processChildStep childStep
       }
-    }
-  }
-
-  private def processStepsUsingMap(StoryContext context, map, BehaviorStep exampleStep) {
-    def (int max, fields) = extractMapExampleData(map)
-    int oldIteration = currentIteration
-    currentIteration = 0
-
-    try {
-      for (int idx = 0; idx < max; idx++) {
-        fields.each { field ->
-          context.binding.setProperty field, map[field][idx]
-        }
-
-        processStoryContext(context, exampleStep)
-      }
-    } finally {
-      currentIteration = oldIteration
     }
   }
 
@@ -179,8 +169,7 @@ public class StoryProcessing {
       action = {}
     else if (childStep.stepType == BehaviorStepType.THEN)
       action = {
-        use(BehaviorCategory) {
-//          println "runnig then closure"
+        use(extensionCategories) {
           childStep.replay()
         }
         childStep.result = new Result(Result.SUCCEEDED)
@@ -188,7 +177,9 @@ public class StoryProcessing {
       }
     else // other child steps
       action = {
-        childStep.replay()
+        use(additionalExtensionCategories) {
+          childStep.replay()
+        }
         childStep.result = new Result(Result.SUCCEEDED)
         listener.gotResult childStep.result
       }
@@ -224,6 +215,8 @@ public class StoryProcessing {
 
   private def processScenario(BehaviorStep step, isRealScenario) {
 
+    currentStep = step
+
     step.decodeCurrentName currentIteration
 //    println "running scenario ${step.name}"
 
@@ -241,12 +234,19 @@ public class StoryProcessing {
         processScenario(currentContext.beforeEach, false)
 
       step.childSteps.each { childStep ->
+        def oldCurrent = currentStep
 
-//        println "childStep ${childStep.stepType} ${childStep.name}"
+        currentStep = childStep
+
+        try {
         if (childStep.stepType == BehaviorStepType.BEHAVES_AS)
           processSharedScenarios(childStep)
+        else if ( childStep.stepType == BehaviorStepType.EXTENSION_POINT )
+          childStep.extensionPoint.process(step, currentContext.binding, listener)
         else if (childStep.closure && processing.contains(childStep.stepType)) {
           processChildStep(childStep)
+        } } finally {
+          currentStep = oldCurrent
         }
       }
 
@@ -267,5 +267,10 @@ public class StoryProcessing {
       if (isRealScenario)
         currentContext.notifyPlugins { plugin, binding -> plugin.afterScenario(binding) }
     }
+  }
+
+  // chances are this will happen in a given/when/then
+  def executeExtensionMethod(ExtensionPoint ex) {
+    ex.process(currentStep, currentContext.binding, listener)
   }
 }

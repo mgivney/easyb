@@ -12,16 +12,21 @@ import org.easyb.util.BehaviorStepType
  */
 class StoryKeywords extends BehaviorKeywords {
   def scenariosRun = false
+  StoryProcessing storyRunning // not null if story is in flight, used for extension points to pass thru
+  def binding
 
   StoryContext topContext
   StoryContext currentContext
   BehaviorStep currentStep
+
+  def extensionCategories = []
 
   StoryKeywords(ExecutionListener listener, Binding binding) {
     super(listener)
 
     topContext = new StoryContext(binding)
     currentContext = topContext
+    this.binding = binding
   }
 
   /**
@@ -34,7 +39,7 @@ class StoryKeywords extends BehaviorKeywords {
    * @param closure
    */
   private void processExamplesClosure(description, data, closure) {
-    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, closure, null)
+    def step = new BehaviorStep(BehaviorStepType.WHERE, description, closure, null)
 
     StoryContext ctx = new StoryContext(currentContext)
 
@@ -77,7 +82,7 @@ class StoryKeywords extends BehaviorKeywords {
     // take scenario out of current context
     currentContext.removeStep(scenarioStep)
 
-    def step = new BehaviorStep(BehaviorStepType.EXAMPLES, description, null, scenarioStep.parentStep)
+    def step = new BehaviorStep(BehaviorStepType.WHERE, description, null, scenarioStep.parentStep)
 
     // if it is inside a parent (e.g. example), remove it
     if ( scenarioStep.parentStep ) {
@@ -102,7 +107,7 @@ class StoryKeywords extends BehaviorKeywords {
   }
 
   def examples(description, data, closure) {
-    if (currentStep && currentStep.stepType != BehaviorStepType.EXAMPLES && currentStep.stepType != BehaviorStepType.SCENARIO) {
+    if (currentStep && currentStep.stepType != BehaviorStepType.WHERE && currentStep.stepType != BehaviorStepType.SCENARIO) {
       throw new IncorrectGrammarException("examples keyword were it should not exist.")
     }
 
@@ -118,7 +123,7 @@ class StoryKeywords extends BehaviorKeywords {
         // otherwise it is example data for the current context. If top level, no problem, if in example step, also no problem
         currentContext.exampleData = data
       }
-    } else if ( currentStep.stepType == BehaviorStepType.EXAMPLES ) {
+    } else if ( currentStep.stepType == BehaviorStepType.WHERE ) {
       if ( !closure ) // we already have data for this story context thanks,
         throw new IncorrectGrammarException("examples keyword inside an examples closure must also pass a closure for context")
       
@@ -206,12 +211,17 @@ class StoryKeywords extends BehaviorKeywords {
 
     scenariosRun = true
 
-    StoryProcessing sp = new StoryProcessing()
-    sp.processStory(topContext, executeStory, listener)
+    storyRunning = new StoryProcessing(extensionCategories)
+
+    try {
+      storyRunning.processStory(topContext, executeStory, listener)
+    } finally {
+      storyRunning = null
+    }
   }
 
 
-  private def addStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
+  private BehaviorStep addStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
     BehaviorStep step = new BehaviorStep(inStepType, inStepName, closure, currentStep)
     step.storyContext = currentContext
 
@@ -222,6 +232,8 @@ class StoryKeywords extends BehaviorKeywords {
       currentContext.addStep step
     else
       currentStep.addChildStep step
+
+    return step
   }
 
   private def addPlugableStep(BehaviorStepType inStepType, String inStepName, Closure closure) {
@@ -290,4 +302,15 @@ class StoryKeywords extends BehaviorKeywords {
     }
   }
 
+  def extensionMethod( closure, params ) {
+    def ex = new ExtensionPoint(closure:closure, params:params)
+
+    if ( storyRunning )
+      storyRunning.executeExtensionMethod( ex )
+    else if ( currentStep ) {
+      def step = addStep(BehaviorStepType.EXTENSION_POINT, "[extension point]", null)
+
+      step.extensionPoint = ex
+    }
+  }
 }

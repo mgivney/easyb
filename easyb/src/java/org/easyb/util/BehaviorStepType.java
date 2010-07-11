@@ -1,6 +1,5 @@
 package org.easyb.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +26,8 @@ public enum BehaviorStepType {
   NARRATIVE_ROLE("role"),
   NARRATIVE_FEATURE("feature"),
   NARRATIVE_BENEFIT("benefit"),
-  EXAMPLES("examples");
+  EXTENSION_POINT("extension_point"),
+  WHERE("where");
 
   private final String type;
 
@@ -78,7 +78,7 @@ public enum BehaviorStepType {
 
   public static List<BehaviorStepType> grossCountableTypes = Arrays.asList(
     BehaviorStepType.SPECIFICATION, BehaviorStepType.SCENARIO, BehaviorStepType.BEFORE, BehaviorStepType.AFTER, BehaviorStepType.AFTER_EACH,
-    BehaviorStepType.BEFORE_EACH, BehaviorStepType.EXAMPLES);
+    BehaviorStepType.BEFORE_EACH, BehaviorStepType.WHERE);
 
   public String format(BehaviorStepType genesis) {
     String format = type;

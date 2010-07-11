@@ -9,11 +9,14 @@ class SpecificationKeywords extends BehaviorKeywords {
   private BehaviorStepStack stepStack
   private def beforeIt
   private def afterIt
+  private def categories = []
 
   SpecificationKeywords(ExecutionListener listener) {
     super(listener)
 
     stepStack = new BehaviorStepStack(listener)
+    
+    categories.add(BehaviorCategory.class)
   }
 
 
@@ -29,6 +32,12 @@ class SpecificationKeywords extends BehaviorKeywords {
     stepStack.stopStep()
   }
 
+  def extensionMethod( closure, params, binding ) {
+    def ex = new ExtensionPoint(closure:closure, params:params)
+
+    ex.process(stepStack.currentStep, binding, listener)
+  }
+
   def it(spec, closure) {
     stepStack.startStep(BehaviorStepType.IT, spec)
     closure.delegate = new EnsuringDelegate()
@@ -37,7 +46,7 @@ class SpecificationKeywords extends BehaviorKeywords {
         beforeIt()
       }
       listener.gotResult(new Result(Result.SUCCEEDED))
-      use(BehaviorCategory) {
+      use(categories) {
         closure()
       }
       if (afterIt != null) {

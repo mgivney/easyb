@@ -35,6 +35,8 @@ public class StoryContext {
 
   StoryContext parentContext;
 
+  List<StoryContext> sharedContexts = new ArrayList<StoryContext>();
+
   /* before step */
   BehaviorStep beforeScenarios
   /* after step */
@@ -49,7 +51,7 @@ public class StoryContext {
   BehaviorStep afterEach
 
   ArrayList<EasybPlugin> activePlugins = new ArrayList<EasybPlugin>()
-  Binding binding  // this is constant across all contexts
+  StoryBinding binding  // this is constant across all contexts
 
   /* the behavior that represents the example data, output for reporting each time we loop*/
   BehaviorStep exampleStep
