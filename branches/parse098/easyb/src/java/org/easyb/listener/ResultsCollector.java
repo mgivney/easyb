@@ -2,6 +2,7 @@ package org.easyb.listener;
 
 import org.easyb.BehaviorStep;
 import org.easyb.domain.Behavior;
+import org.easyb.result.ReportingTag;
 import org.easyb.result.Result;
 import org.easyb.util.BehaviorStepType;
 
@@ -41,6 +42,10 @@ public class ResultsCollector implements ExecutionListener {
   }
 
   public void stopBehavior(BehaviorStep step, Behavior behavior) {
+  }
+
+  public void tag(ReportingTag tag) {
+    currentStep.addReportingTag(tag);
   }
 
   public synchronized void startStep(final BehaviorStep step) {

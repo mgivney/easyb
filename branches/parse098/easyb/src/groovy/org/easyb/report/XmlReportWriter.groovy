@@ -34,7 +34,11 @@ class XmlReportWriter implements ReportWriter {
     def walkStoryChildren(MarkupBuilder xml, BehaviorStep step) {
         if (step.childSteps.size() == 0) {
             if (step.result == null) {
-                xml."${step.stepType.type()}"(name: step.name)
+                xml."${step.stepType.type()}"(name: step.name) {
+                  if (step.tags?.size()) {
+                    walkTags(xml, step.tags)
+                  }
+                }
             } else {
                 xml."${step.stepType.type()}"(name: step.name, result: step.result.status) {
                     if (step.result.failed()) {
@@ -44,6 +48,9 @@ class XmlReportWriter implements ReportWriter {
                             }
                         }
                     }
+                    if (step.tags?.size()) {
+                      walkTags(xml, step.tags)
+                    }
                 }
             }
         } else {
@@ -51,6 +58,9 @@ class XmlReportWriter implements ReportWriter {
                 xml."${step.stepType.type()}"(name: step.name, result: step.result.status, executionTime: step.executionTotalTimeInMillis) {
                     if (step.description) {
                         xml.description(step.description)
+                    }
+                    if (step.tags?.size()) {
+                      walkTags(xml, step.tags)
                     }
                     for (child in step.childSteps) {
                         walkStoryChildren(xml, child)
@@ -67,6 +77,9 @@ class XmlReportWriter implements ReportWriter {
                     if (step.description) {
                         xml.description(step.description)
                     }
+                    if (step.tags?.size()) {
+                      walkTags(xml, step.tags)
+                    }
                     for (child in step.childSteps) {
                         walkStoryChildren(xml, child)
                     }
@@ -76,12 +89,26 @@ class XmlReportWriter implements ReportWriter {
 
     }
 
-    def walkSpecificationChildren(MarkupBuilder xml, BehaviorStep step) {
+  def walkTags(MarkupBuilder markupBuilder, List<org.easyb.result.ReportingTag> reportingTags) {
+    reportingTags.each { tag ->
+      tag.toXml markupBuilder
+    }
+  }
+
+  def walkSpecificationChildren(MarkupBuilder xml, BehaviorStep step) {
         if (step.childSteps.size() == 0) {
             if (step.result == null) {
-                xml."${step.stepType.type()}"(name: step.name)
+                xml."${step.stepType.type()}"(name: step.name) {
+                  if (step.tags?.size()) {
+                    walkTags(xml, step.tags)
+                  }
+
+                }
             } else {
                 xml."${step.stepType.type()}"(name: step.name, result: step.result.status, executionTime: step.executionTotalTimeInMillis) {
+                  if (step.tags?.size()) {
+                    walkTags(xml, step.tags)
+                  }
                     if (step.result.failed()) {
                         failure(message: step.result.cause()?.getMessage()) {
                             if (!(step.result.cause instanceof VerificationException))
@@ -95,6 +122,9 @@ class XmlReportWriter implements ReportWriter {
                 if (step.description) {
                     xml.description(step.description)
                 }
+              if (step.tags?.size()) {
+                walkTags(xml, step.tags)
+              }
                 for (child in step.childSteps) {
                     walkSpecificationChildren(xml, child)
                 }

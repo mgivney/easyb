@@ -2,19 +2,38 @@ package org.easyb
 
 import org.easyb.listener.ExecutionListener
 import org.easyb.plugin.PluginLocator
-import org.easyb.exception.VerificationException
-
+import org.easyb.plugin.SyntaxExtension
 
 
 class StoryBinding extends Binding {
   StoryKeywords story
+  // where the story is located - necessary for offsets for shared stories
+  File storyDirectory
+
+  def addSyntax(SyntaxExtension ext) {
+    ext.getSyntax()?.each { methodName, closure ->
+      story.binding."$methodName" = { Object[] params ->
+        story.extensionMethod(closure, params)
+      }
+    }
+
+    ext.getExtensionCategories()?.each { cat ->
+      story.extensionCategories.add cat
+    }
+  }
 
   public replaySteps(boolean executeStory) {
     story.replaySteps(executeStory, this)
   }
 
-  def StoryBinding(ExecutionListener listener) {
+  def StoryBinding(ExecutionListener listener, File storyDirectory) {
     this.story = new StoryKeywords(listener, this)
+    this.storyDirectory = storyDirectory
+
+    // load all auto syntax adding plugins
+    PluginLocator.findAllAutoloadingSyntaxExtensions().each { SyntaxExtension ext ->
+      addSyntax(ext)
+    }
 
     where = { description, exampleData, closure = null ->
       if (exampleData != null) {
@@ -36,6 +55,24 @@ class StoryBinding extends Binding {
       if (pluginVariableName) {
         setProperty(pluginVariableName, plugin)
       }
+    }
+
+    extension = { name ->
+      addSyntax(PluginLocator.findSyntaxExtensionByName(name))
+    }
+
+    shared_stories = { String file ->
+      if (!storyDirectory)
+      storyDirectory = new File(".")
+
+      if (file.indexOf('.') < 0)
+      file += ".shared"
+
+      GroovyShell g = new GroovyShell(story.binding.getClass().getClassLoader(), story.binding);
+
+      File storyFile = new File(storyDirectory, file);
+
+      g.evaluate(storyFile);
     }
 
     before = {description = "", closure = {} ->
@@ -146,6 +183,7 @@ class StoryBinding extends Binding {
     it_behaves_as = {description ->
       story.itBehavesAs(description)
     }
+
   }
 
   def getAt(ArrayList list) {
@@ -157,7 +195,11 @@ class StoryBinding extends Binding {
    * has definitions for methods such as "when" and "given", which are used
    * in the context of stories.
    */
+  static StoryBinding getBinding(listener, File storyDirectory) {
+    return new StoryBinding(listener, storyDirectory)
+  }
+
   static StoryBinding getBinding(listener) {
-    return new StoryBinding(listener)
+    return getBinding(listener, null)
   }
 }
