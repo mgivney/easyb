@@ -1,5 +1,4 @@
 #summary 0.9.7 features
-#labels Featured
 
 = What's in easyb 0.9.7 =
 
