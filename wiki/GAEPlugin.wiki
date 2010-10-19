@@ -1,4 +1,5 @@
 #summary Google App Engine plugin uses current GAE local unit testing
+#labels Featured,Cookbook
 
 = Introduction =
 
