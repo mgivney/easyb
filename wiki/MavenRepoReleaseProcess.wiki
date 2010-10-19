@@ -1,0 +1,36 @@
+#summary Releasing easyb artifacts for use by Maven builds
+#labels Phase-Implementation
+
+= Introduction =
+
+A brief outline of how to release the easyb artifacts for use by Maven builds.
+
+
+= Details =
+
+For more details on the general Maven release process using the Sonatype OSS Maven repository, see the documentation at [https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide the Sonatype OSS Maven Repo Usage Guide]
+
+  * sign up for an account to be able to deploy easyb on the Sonatype OSS Nexus instance
+
+  * in your Maven settings.xml file, make sure you have a repository called "sonatype-nexus-staging" with your Nexus login and password
+
+  * check out the tagged release from svn
+
+  * from the easyb source, run the Gant target "generate-pom" to generate a pom for the latest version of easyb (NOTE: you may need to edit the pom to match the actual easyb version number)
+
+  * either build the easyb artifact or (probably safer) download the published easyb tar.gz package and extract it
+
+  * copy the generated pom to the directory where you extracted the tar.gz contents
+
+  * from that directory, use the Maven gpg plugin to sign and deploy the easyb artifacts.  For example, for the easyb 0.9.8 release:
+    * *Main artifact*: {{{mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=easyb-0.9.8.pom -Dfile=easyb-0.9.8.jar}}}
+    * *Sources*: {{{mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=easyb-0.9.8.pom -Dfile=easyb-0.9.8-sources.jar -Dclassifier=sources}}}
+   * *Javadocs*: {{{mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=easyb-0.9.8.pom -Dfile=easyb-0.9.8-javadocs.jar -Dclassifier=javadoc}}}
+
+  * once the artifacts are successfully deployed to the Nexus repo, log in to Nexus to see the newly created staging repository (should be something like "org.easyb-XXXX (u: username a: IP-address)" )
+
+  * to finalize the release, "close" the staging repository by selecting the staging repository in the Nexus UI and clicking the "close" button at the top of the window.
+
+  * if everything has gone smoothly, the artifacts should now be "released".  If there were any error messages, chances are there is something wrong with the pom file for the project.  Fix the problems, drop the repository, and re-upload the artifacts.
+
+  * once the artifacts are released successfully, they should be automatically synced with Maven central.  Check at [http://repo1.maven.org/maven2/org/easyb/easyb/ Maven Central]  after a few hours to be sure.
