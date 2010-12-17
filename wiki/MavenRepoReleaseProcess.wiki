@@ -15,13 +15,14 @@ For more details on the general Maven release process using the Sonatype OSS Mav
   * in your Maven settings.xml file, make sure you have a repository called "sonatype-nexus-staging" with your Nexus login and password
 
   * maven sure you have a
-<profile>
+ {{{
+         <profile>
             <id>sonatype</id>
             <properties>
               <gpg.passphrase>whatever</gpg.passphrase>
             </properties>
           </profile>
-
+}}}
    profile in your settings.xml file
 
   * use the standard mvn release:prepare && mvn release:perform tasks to release the artifact to the Nexus repository. 
