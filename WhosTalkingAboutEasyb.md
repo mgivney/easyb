@@ -1,0 +1,2 @@
+Here's what people on the [DZone](http://www.dzone.com/links/index.html) and [Twitter](http://www.dzone.com/links/index.html) are saying about easyb!
+<wiki:gadget url="http://google-code-feed-gadget.googlecode.com/svn/trunk/gadget.xml" up\_feeds="http://www.dzone.com/links/feed/search/easyb/rss.xml|http://search.twitter.com/search.atom?q=easyb" width="600px" height="540px" border="0"/>
